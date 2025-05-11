@@ -1,0 +1,55 @@
+-- Create user_table
+CREATE TABLE `user_table` (
+  `user_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `username` VARCHAR(255) NOT NULL UNIQUE,
+  `email` VARCHAR(255) NOT NULL UNIQUE,
+  `password` VARCHAR(255) NOT NULL,
+  `profile_photo` VARCHAR(255) DEFAULT NULL,
+  `bio` TEXT DEFAULT NULL,
+  `is_admin` BOOLEAN NOT NULL DEFAULT FALSE,
+  `security_question` VARCHAR(255) NOT NULL,
+  `security_answer` VARCHAR(255) NOT NULL,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`user_id`)
+);
+
+-- Create posts_table
+CREATE TABLE `posts_table` (
+  `post_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` INT(11) UNSIGNED NOT NULL,
+  `title` VARCHAR(255) NOT NULL,
+  `category` VARCHAR(255) DEFAULT NULL,
+  `image` VARCHAR(255) DEFAULT NULL,
+  `description` TEXT DEFAULT NULL,
+  `date_created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `featured` BOOLEAN NOT NULL DEFAULT FALSE,
+  `updated_at` TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `status` VARCHAR(20) NOT NULL DEFAULT 'published',
+  PRIMARY KEY (`post_id`),
+  FOREIGN KEY (`user_id`) REFERENCES `user_table` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Create likes_table
+CREATE TABLE `likes_table` (
+  `like_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` INT(11) UNSIGNED NOT NULL,
+  `post_id` INT(11) UNSIGNED NOT NULL,
+  `date_liked` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`like_id`),
+  UNIQUE KEY `user_post_unique` (`user_id`, `post_id`),
+  FOREIGN KEY (`user_id`) REFERENCES `user_table` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`post_id`) REFERENCES `posts_table` (`post_id`) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Create comments_table
+CREATE TABLE `comments_table` (
+  `comment_id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `user_id` INT(11) UNSIGNED NOT NULL,
+  `post_id` INT(11) UNSIGNED NOT NULL,
+  `comment_text` TEXT NOT NULL,
+  `date_commented` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`comment_id`),
+  FOREIGN KEY (`user_id`) REFERENCES `user_table` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (`post_id`) REFERENCES `posts_table` (`post_id`) ON DELETE CASCADE ON UPDATE CASCADE
+);
