@@ -170,6 +170,11 @@ class AuthController extends CI_Controller
             'isLoggedIn' => true
         ];
 
+        // Add profile photo to session if exists
+        if (isset($user['profile_photo']) && $user['profile_photo']) {
+            $sessionData['profile_photo'] = $user['profile_photo'];
+        }
+
         $this->session->set_userdata($sessionData);
 
         // Redirect to feed page
