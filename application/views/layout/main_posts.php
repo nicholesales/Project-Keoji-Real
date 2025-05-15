@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog App</title>
+    <title><?= isset($title) ? $title : 'Blog App' ?></title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -309,7 +309,7 @@
                     <div class="user-info">
                         <p class="username">
                             <?= htmlspecialchars($this->session->userdata('username'), ENT_QUOTES, 'UTF-8') ?></p>
-                        <p class="role">10 Post</p>
+                        <p class="role"><?= $post_count ?? $this->session->userdata('post_count') ?? 0 ?> Posts</p>
                     </div>
                 </div>
             <?php endif; ?>
@@ -318,7 +318,11 @@
                 <li class="active">
                     <a href="<?= site_url('posts') ?>">
                         <i class="bi bi-grid sidebar-icon"></i>Feed
-                        <span class="nav-count">9</span>
+                        <?php if(isset($post_count) && $post_count > 0): ?>
+                            <span class="nav-count"><?= $post_count ?></span>
+                        <?php elseif($this->session->userdata('post_count') && $this->session->userdata('post_count') > 0): ?>
+                            <span class="nav-count"><?= $this->session->userdata('post_count') ?></span>
+                        <?php endif; ?>
                     </a>
                 </li>
                 <li>
@@ -345,7 +349,7 @@
 
             <?php if ($this->session->userdata('isLoggedIn')): ?>
                 <div class="sidebar-footer">
-                    <a href="<?= site_url('auth/login') ?>" class="btn btn-outline-danger btn-sm w-100">
+                    <a href="<?= site_url('auth/logout') ?>" class="btn btn-outline-danger btn-sm w-100">
                         <i class="bi bi-box-arrow-right"></i> Logout
                     </a>
                 </div>
@@ -364,7 +368,7 @@
                     <button type="button" id="sidebarCollapse" aria-label="Toggle Sidebar">
                         <i class="bi bi-list"></i>
                     </button>
-                    <h4 class="m-0">POST</h4>
+                    <h4 class="m-0"><?= isset($title) ? $title : 'POST' ?></h4>
 
                     <div class="ms-auto d-flex align-items-center">
                         <button class="btn btn-link position-relative me-3" aria-label="Theme Toggle">
@@ -387,7 +391,7 @@
                                     <li>
                                         <hr class="dropdown-divider">
                                     </li>
-                                    <li><a class="dropdown-item" href="<?= site_url('auth/login') ?>">Logout</a></li>
+                                    <li><a class="dropdown-item" href="<?= site_url('auth/logout') ?>">Logout</a></li>
                                 </ul>
                             </div>
                         <?php else: ?>

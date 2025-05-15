@@ -1,17 +1,14 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class PostsController extends CI_Controller
+class PostsController extends MY_Controller
 {
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('post_model');
-        $this->load->library('session');
         $this->load->helper(array('form', 'url'));
         $this->load->library('form_validation');
-        // Remove this line - security is already loaded by CI core
-        // $this->load->library('security');
+        // Parent constructor already loads post_model and session
     }
     
     // Display all posts (main page after login)
@@ -63,6 +60,9 @@ class PostsController extends CI_Controller
         // Set the page title
         $data['title'] = 'Blog Posts';
         
+        // Add post count to the view data
+        $data['post_count'] = $this->user_data['post_count'];
+        
         // Load the view into a variable
         $data['content'] = $this->load->view('posts/posts_page', $data, TRUE);
         
@@ -70,6 +70,7 @@ class PostsController extends CI_Controller
         $this->load->view('layout/main_posts', $data);
     }
     
+    // Rest of the controller remains the same...
     // Create a new post
     public function create()
     {
@@ -180,6 +181,10 @@ class PostsController extends CI_Controller
             
             // If we got here, commit the transaction
             $this->db->trans_commit();
+            
+            // Update the post count in session
+            $post_count = $this->post_model->count_by_user($this->session->userdata('user_id'));
+            $this->session->set_userdata('post_count', $post_count);
             
             echo json_encode([
                 'success' => true, 
@@ -336,9 +341,12 @@ class PostsController extends CI_Controller
         // Delete post from database
         $this->post_model->delete($id);
         
+        // Update the post count in session
+        $post_count = $this->post_model->count_by_user($this->session->userdata('user_id'));
+        $this->session->set_userdata('post_count', $post_count);
+        
         echo json_encode([
             'success' => true, 
             'message' => 'Post deleted successfully'
         ]);
-    }
-}
+    }}

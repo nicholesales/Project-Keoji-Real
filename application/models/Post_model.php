@@ -63,6 +63,13 @@ class Post_model extends CI_Model
         return $this->db->affected_rows();
     }
     
+    // Count posts by user
+    public function count_by_user($user_id)
+    {
+        $this->db->where('user_id', $user_id);
+        return $this->db->count_all_results($this->table);
+    }
+    
     // Validation (similar to CI4's validation rules)
     private function _validate($data)
     {

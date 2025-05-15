@@ -5,7 +5,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
  * @property CI_Input $input
  * @property CI_Session $session
  */
-class AuthController extends CI_Controller
+class AuthController extends MY_Controller
 {
     public function __construct()
     {

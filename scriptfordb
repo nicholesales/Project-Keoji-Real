@@ -53,3 +53,7 @@ CREATE TABLE `comments_table` (
   FOREIGN KEY (`user_id`) REFERENCES `user_table` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   FOREIGN KEY (`post_id`) REFERENCES `posts_table` (`post_id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+ALTER TABLE user_table 
+MODIFY username VARCHAR(30) 
+COLLATE utf8mb4_bin;
