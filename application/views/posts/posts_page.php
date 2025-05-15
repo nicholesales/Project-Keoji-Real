@@ -4,80 +4,379 @@ echo '<!-- Debug: recentPosts count: ' . (isset($recentPosts) ? count($recentPos
 echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featuredPosts) : 'not set') . ' -->';
 ?>
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Blog Posts</h1>
-        <button type="button" class="btn btn-primary" id="newPostBtn">
-            + New Post
+<style>
+/* Custom styles for posts page */
+.blog-posts-section {
+    padding: 20px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.section-header h2 {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+.new-post-btn {
+    background-color: #dc2626;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.new-post-btn:hover {
+    background-color: #b91c1c;
+}
+
+/* Posts cards */
+.posts-container {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 24px;
+}
+
+.post-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 16px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.post-item:last-child {
+    border-bottom: none;
+}
+
+.post-icon {
+    width: 48px;
+    height: 48px;
+    background-color: #dc2626;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 16px;
+    flex-shrink: 0;
+}
+
+.post-icon i {
+    color: white;
+    font-size: 24px;
+}
+
+.post-content {
+    flex: 1;
+}
+
+.post-title {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.post-title a {
+    color: #333;
+    text-decoration: none;
+}
+
+.post-title a:hover {
+    text-decoration: underline;
+}
+
+.post-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #666;
+    font-size: 0.875rem;
+}
+
+.status-badge {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+.status-badge.published {
+    background-color: #10b981;
+    color: white;
+}
+
+.status-badge.draft {
+    background-color: #6b7280;
+    color: white;
+}
+
+.post-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.action-btn:hover {
+    background-color: #f5f5f5;
+}
+
+.action-btn.delete:hover {
+    color: #dc2626;
+}
+
+/* Featured posts section */
+.featured-post-container {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.featured-post-header {
+    padding: 20px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.featured-post-header h2 {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+.featured-post-content {
+    padding: 20px;
+}
+
+.featured-post-item {
+    display: flex;
+    gap: 20px;
+    align-items: start;
+}
+
+.featured-post-image {
+    width: 150px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.featured-post-details {
+    flex: 1;
+}
+
+.featured-post-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.featured-post-snippet {
+    color: #666;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+.featured-post-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.featured-post-stats {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 0.875rem;
+    color: #666;
+}
+
+.featured-post-stats i {
+    margin-right: 4px;
+}
+
+.featured-post-date {
+    font-size: 0.875rem;
+    color: #999;
+}
+
+/* Empty states */
+.empty-state {
+    text-align: center;
+    color: #666;
+    padding: 40px 20px;
+}
+
+.empty-state i {
+    font-size: 48px;
+    color: #ddd;
+    margin-bottom: 16px;
+}
+
+.tabs-nav {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 20px;
+}
+
+.tab-link {
+    padding: 8px 0;
+    border-bottom: 2px solid transparent;
+    color: #666;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.tab-link.active {
+    color: #dc2626;
+    border-bottom-color: #dc2626;
+}
+
+.tab-link:hover {
+    color: #333;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .featured-post-item {
+        flex-direction: column;
+    }
+    
+    .featured-post-image {
+        width: 100%;
+        height: 200px;
+    }
+}
+</style>
+
+<div class="blog-posts-section">
+    <!-- Tabs Navigation -->
+    <div class="tabs-nav">
+        <a href="#all" class="tab-link active">All</a>
+        <a href="#published" class="tab-link">Published</a>
+        <a href="#drafts" class="tab-link">Drafts</a>
+    </div>
+
+    <!-- Blog Posts Header -->
+    <div class="section-header">
+        <h2>Blog Posts</h2>
+        <button type="button" class="new-post-btn" id="newPostBtn">
+            <i class="bi bi-plus"></i> New Post
         </button>
     </div>
 
     <!-- Recent Posts Section -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <h2>Recent Posts</h2>
-        </div>
-        <div class="card-body">
-            <?php if(empty($recentPosts)): ?>
+    <div class="posts-container">
+        <?php if(empty($recentPosts)): ?>
+            <div class="empty-state">
+                <i class="bi bi-file-earmark-text"></i>
                 <p>No posts yet. Create your first post!</p>
-            <?php else: ?>
-                <?php foreach($recentPosts as $post): ?>
-                    <div class="post-item d-flex justify-content-between align-items-center mb-3 p-2 border-bottom">
-                        <div>
-                            <div class="post-title">
+            </div>
+        <?php else: ?>
+            <?php foreach($recentPosts as $post): ?>
+                <div class="post-item" data-post-id="<?= $post['post_id'] ?>">
+                    <div class="post-icon">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </div>
+                    <div class="post-content">
+                        <div class="post-title">
+                            <a href="<?= site_url('posts/view/' . $post['post_id']) ?>">
                                 <?= htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8') ?>
-                                <span class="badge <?= $post['status'] === 'draft' ? 'bg-secondary' : 'bg-success' ?>">
-                                    <?= $post['status'] === 'draft' ? 'Draft' : 'Published' ?>
-                                </span>
-                            </div>
-                            <div class="text-muted small">
-                                <?= date('F d, Y', strtotime($post['date_created'])) ?>
-                            </div>
+                            </a>
                         </div>
-                        <div>
-                            <button class="btn btn-sm btn-outline-primary edit-post" data-id="<?= $post['post_id'] ?>">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger delete-post" data-id="<?= $post['post_id'] ?>">
-                                <i class="bi bi-trash"></i>
-                            </button>
+                        <div class="post-meta">
+                            <span class="status-badge <?= $post['status'] === 'draft' ? 'draft' : 'published' ?>">
+                                <?= $post['status'] === 'draft' ? 'Draft' : 'Published' ?>
+                            </span>
+                            <span><i class="bi bi-calendar3"></i> <?= date('M d, Y', strtotime($post['date_created'])) ?></span>
                         </div>
                     </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </div>
+                    <div class="post-actions">
+                        <button class="action-btn edit-post" data-id="<?= $post['post_id'] ?>" title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="action-btn delete delete-post" data-id="<?= $post['post_id'] ?>" title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
     </div>
 
     <!-- Featured Posts Section -->
-    <div class="card">
-        <div class="card-header">
-            <h2>Featured Post</h2>
-        </div>
-        <div class="card-body">
-            <?php if(empty($featuredPosts)): ?>
+    <div class="section-header">
+        <h2>Featured Post</h2>
+    </div>
+    
+    <div class="featured-post-container">
+        <?php if(empty($featuredPosts)): ?>
+            <div class="empty-state">
+                <i class="bi bi-star"></i>
                 <p>No featured posts yet. Mark a post as featured to see it here!</p>
-            <?php else: ?>
-                <?php foreach($featuredPosts as $post): ?>
-                    <div class="featured-post row mb-4">
-                        <div class="col-md-4">
-                            <img src="<?= base_url('uploads/posts/' . $post['image']) ?>" class="img-fluid rounded" alt="<?= htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8') ?>">
-                        </div>
-                        <div class="col-md-8">
-                            <h3><?= htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8') ?></h3>
-                            <p><?= substr(htmlspecialchars($post['description'], ENT_QUOTES, 'UTF-8'), 0, 200) . (strlen($post['description']) > 200 ? '...' : '') ?></p>
-                            <div class="d-flex justify-content-between">
-                                <div class="text-muted">
-                                    <?= date('F d, Y', strtotime($post['date_created'])) ?>
-                                </div>
-                                <div>
-                                    <span class="badge bg-info"><?= htmlspecialchars($post['category'], ENT_QUOTES, 'UTF-8') ?></span>
+            </div>
+        <?php else: ?>
+            <?php foreach($featuredPosts as $post): ?>
+                <div class="featured-post-content">
+                    <div class="featured-post-item">
+                        <?php if(!empty($post['image'])): ?>
+                        <img src="<?= base_url('uploads/posts/' . $post['image']) ?>" 
+                             class="featured-post-image" 
+                             alt="<?= htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8') ?>">
+                        <?php endif; ?>
+                        <div class="featured-post-details">
+                            <small class="text-muted mb-2 d-block">
+                                Featured post with tag #<?= htmlspecialchars($post['category'], ENT_QUOTES, 'UTF-8') ?>
+                            </small>
+                            <h3 class="featured-post-title">
+                                <?= htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8') ?>
+                            </h3>
+                            <p class="featured-post-snippet">
+                                <?= substr(htmlspecialchars($post['description'], ENT_QUOTES, 'UTF-8'), 0, 150) . (strlen($post['description']) > 150 ? '...' : '') ?>
+                            </p>
+                            <div class="featured-post-footer">
+                                <div class="featured-post-stats">
+                                    <span><i class="bi bi-heart"></i> <?= rand(500, 9999) ?></span>
+                                    <span><i class="bi bi-chat"></i> <?= rand(50, 999) ?></span>
+                                    <span><i class="bi bi-eye"></i> <?= number_format(rand(1000, 9999)) ?>k</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </div>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -169,6 +468,17 @@ $(document).ready(function() {
     $('#saveDraftBtn').off('click');
     $('#publishBtn').off('click');
     
+    // Tab switching functionality
+    $('.tab-link').click(function(e) {
+        e.preventDefault();
+        $('.tab-link').removeClass('active');
+        $(this).addClass('active');
+        
+        // Here you could filter posts based on the selected tab
+        const filter = $(this).attr('href').substring(1);
+        // Implement filtering logic here if needed
+    });
+    
     // Open modal for new post
     $('#newPostBtn').click(function() {
         $('#postModalLabel').text('Create New Post');
@@ -254,7 +564,6 @@ $(document).ready(function() {
         console.log('Form data:', Object.fromEntries(formData));
         
         // Determine URL based on whether this is an edit or create
-        // Fix: Use site_url instead of base_url for proper controller routing
         const url = postId 
             ? '<?= site_url("PostsController/update") ?>/' + postId 
             : '<?= site_url("PostsController/create") ?>';
