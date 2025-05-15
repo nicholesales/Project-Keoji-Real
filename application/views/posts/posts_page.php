@@ -160,6 +160,10 @@ echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featu
 
 <script>
 $(document).ready(function() {
+    // Store the CSRF token for reuse
+    const csrfToken = '<?= $this->security->get_csrf_hash() ?>';
+    const csrfName = '<?= $this->security->get_csrf_token_name() ?>';
+    
     // Clear any existing handlers to prevent duplicates
     $('#postForm').off('submit');
     $('#saveDraftBtn').off('click');
@@ -250,7 +254,10 @@ $(document).ready(function() {
         console.log('Form data:', Object.fromEntries(formData));
         
         // Determine URL based on whether this is an edit or create
-        const url = postId ? '<?= base_url('posts/update') ?>/' + postId : '<?= base_url('posts/create') ?>';
+        // Fix: Use site_url instead of base_url for proper controller routing
+        const url = postId 
+            ? '<?= site_url("PostsController/update") ?>/' + postId 
+            : '<?= site_url("PostsController/create") ?>';
         console.log('Submitting to URL:', url);
         
         // Submit form
@@ -260,6 +267,7 @@ $(document).ready(function() {
             data: formData,
             contentType: false,
             processData: false,
+            dataType: 'json',
             success: function(response) {
                 console.log('Success response:', response);
                 isSubmitting = false;
@@ -272,12 +280,23 @@ $(document).ready(function() {
                 } else {
                     // Display errors
                     console.error('Error response:', response);
-                    alert('Error: ' + JSON.stringify(response.errors || response.message));
+                    let errorMessage = 'Error: ';
+                    if (response.errors) {
+                        errorMessage += Object.values(response.errors).join('\n');
+                    } else {
+                        errorMessage += response.message || 'Unknown error';
+                    }
+                    alert(errorMessage);
                 }
             },
             error: function(xhr, status, error) {
-                console.error('AJAX error:', xhr.responseText);
-                alert('An error occurred. Please check console for details.');
+                console.error('AJAX error:', {
+                    status: xhr.status,
+                    statusText: xhr.statusText,
+                    responseText: xhr.responseText,
+                    error: error
+                });
+                alert('An error occurred. Status: ' + xhr.status + '. Please check console for details.');
                 isSubmitting = false;
                 $('#saveDraftBtn, #publishBtn').prop('disabled', false);
             }
@@ -290,7 +309,7 @@ $(document).ready(function() {
         
         // Fetch post data
         $.ajax({
-            url: '<?= base_url('posts/edit') ?>/' + postId,
+            url: '<?= site_url("PostsController/edit") ?>/' + postId,
             type: 'GET',
             dataType: 'json',
             success: function(response) {
@@ -306,7 +325,7 @@ $(document).ready(function() {
                     $('#featured').prop('checked', post.featured == 1);
                     
                     // Show image preview
-                    $('#imagePreview').attr('src', '<?= base_url('uploads/posts') ?>/' + post.image);
+                    $('#imagePreview').attr('src', '<?= base_url("uploads/posts") ?>/' + post.image);
                     $('#imagePreviewContainer').removeClass('d-none');
                     
                     // Image not required when editing
@@ -318,8 +337,8 @@ $(document).ready(function() {
                     alert('Error: ' + response.message);
                 }
             },
-            error: function() {
-                alert('An error occurred. Please try again.');
+            error: function(xhr) {
+                alert('An error occurred. Status: ' + xhr.status);
             }
         });
     });
@@ -336,9 +355,9 @@ $(document).ready(function() {
         const postId = $(this).data('id');
         
         $.ajax({
-            url: '<?= base_url('posts/delete') ?>/' + postId,
+            url: '<?= site_url("PostsController/delete") ?>/' + postId,
             type: 'POST',
-            data: { <?= $this->security->get_csrf_token_name() ?>: '<?= $this->security->get_csrf_hash() ?>' },
+            data: { [csrfName]: csrfToken },
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
@@ -348,8 +367,8 @@ $(document).ready(function() {
                     alert('Error: ' + response.message);
                 }
             },
-            error: function() {
-                alert('An error occurred. Please try again.');
+            error: function(xhr) {
+                alert('An error occurred. Status: ' + xhr.status);
             }
         });
     });
