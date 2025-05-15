@@ -1,4 +1,7 @@
-<!-- Background animation div already in main layout -->
+<?php
+// This is the updated login.php file that integrates perfectly with the main layout
+?>
+<!-- Background animation and particles are handled by the main layout -->
 
 <div class="container py-5 login-container">
     <div class="row justify-content-center">
@@ -66,11 +69,17 @@
                 <div class="featured-tag">Latest Post</div>
                 <h4>10 Tips for Better Blog Writing</h4>
                 <p>Discover how to engage your audience with captivating content...</p>
-                <a href="#">Read More</a>
+                <a href="#" class="read-more-link">Read More</a>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Let's add some complementary CSS for the login page that matches the main theme -->
+<style>
+    /* Login form specific styles */
+
+</style>
 
 <script>
 // Function to toggle password visibility
