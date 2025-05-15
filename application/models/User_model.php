@@ -14,118 +14,71 @@ class User_model extends CI_Model
     // Get user by ID
     public function get($id)
     {
-        return $this->db->get_where($this->table, [$this->primaryKey => $id])->row_array();
+        $this->db->where($this->primaryKey, $id);
+        $query = $this->db->get($this->table);
+        return $query->row_array();
     }
     
-    // Get user by specific field
+    // Get user by ID (alias for compatibility)
+    public function get_by_id($id)
+    {
+        return $this->get($id);
+    }
+    
+    // Get user by field
     public function get_where($field, $value)
     {
-        return $this->db->get_where($this->table, [$field => $value])->row_array();
-    }
-    
-    // Get all users
-    public function get_all()
-    {
-        return $this->db->get($this->table)->result_array();
+        $this->db->where($field, $value);
+        $query = $this->db->get($this->table);
+        return $query->row_array();
     }
     
     // Insert new user
     public function insert($data)
     {
-        // Validate data before insert
-        if ($this->_validate($data)) {
-            // Password is already hashed in the controller
-            $this->db->set('created_at', date('Y-m-d H:i:s'));
-            $this->db->set('updated_at', date('Y-m-d H:i:s'));
-            $this->db->insert($this->table, $data);
-            return $this->db->insert_id();
-        }
-        return false;
+        return $this->db->insert($this->table, $data);
     }
     
     // Update user
-    public function update($id, $data)
+    public function update($user_id, $data)
     {
-        // Validate data before update
-        if ($this->_validate($data, $id)) {
-            // If password is present, hash it
-            if (isset($data['password']) && !empty($data['password'])) {
-                $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-            }
-            
-            $this->db->set('updated_at', date('Y-m-d H:i:s'));
-            $this->db->where($this->primaryKey, $id);
-            $this->db->update($this->table, $data);
-            return $this->db->affected_rows();
-        }
-        return false;
+        $this->db->where('user_id', $user_id);
+        return $this->db->update($this->table, $data);
     }
     
-    // Update password directly
+    // Update password
     public function update_password($email, $password)
     {
-        $this->db->set('password', $password);
-        $this->db->set('updated_at', date('Y-m-d H:i:s'));
         $this->db->where('email', $email);
-        $this->db->update($this->table);
-        return $this->db->affected_rows();
+        return $this->db->update($this->table, ['password' => $password]);
     }
     
     // Delete user
-    public function delete($id)
+    public function delete($user_id)
     {
-        $this->db->where($this->primaryKey, $id);
-        $this->db->delete($this->table);
-        return $this->db->affected_rows();
+        $this->db->where('user_id', $user_id);
+        return $this->db->delete($this->table);
     }
     
-    // Validation (similar to CI4's validation rules)
-    private function _validate($data, $id = null)
+    // Check if username exists (excluding specific user)
+    public function username_exists($username, $exclude_user_id = null)
     {
-        $this->load->library('form_validation');
-        
-        $this->form_validation->reset_validation();
-        $this->form_validation->set_data($data);
-        
-        if (isset($data['username'])) {
-            $is_unique = '';
-            if ($id) {
-                $is_unique = '|is_unique[user_table.username.user_id.'.$id.']';
-            } else {
-                $is_unique = '|is_unique[user_table.username]';
-            }
-            $this->form_validation->set_rules('username', 'Username', 'required|min_length[3]|max_length[30]'.$is_unique);
+        $this->db->where('username', $username);
+        if ($exclude_user_id) {
+            $this->db->where('user_id !=', $exclude_user_id);
         }
-        
-        if (isset($data['email'])) {
-            $is_unique = '';
-            if ($id) {
-                $is_unique = '|is_unique[user_table.email.user_id.'.$id.']';
-            } else {
-                $is_unique = '|is_unique[user_table.email]';
-            }
-            $this->form_validation->set_rules('email', 'Email', 'required|valid_email'.$is_unique);
+        $query = $this->db->get($this->table);
+        return $query->num_rows() > 0;
+    }
+    
+    // Check if email exists (excluding specific user)
+    public function email_exists($email, $exclude_user_id = null)
+    {
+        $this->db->where('email', $email);
+        if ($exclude_user_id) {
+            $this->db->where('user_id !=', $exclude_user_id);
         }
-        
-        if (isset($data['password']) && empty($id)) {
-            // Only validate password for new users or if password is being updated
-            $this->form_validation->set_rules('password', 'Password', 'required|min_length[8]');
-        }
-        
-        if (isset($data['security_question'])) {
-            $this->form_validation->set_rules('security_question', 'Security Question', 'required');
-        }
-        
-        if (isset($data['security_answer'])) {
-            $this->form_validation->set_rules('security_answer', 'Security Answer', 'required');
-        }
-        
-        // Custom error messages
-        $this->form_validation->set_message('required', '%s is required');
-        $this->form_validation->set_message('min_length', '%s must be at least %s characters long');
-        $this->form_validation->set_message('is_unique', 'This %s is already taken');
-        $this->form_validation->set_message('valid_email', 'Please enter a valid email address');
-        
-        return $this->form_validation->run();
+        $query = $this->db->get($this->table);
+        return $query->num_rows() > 0;
     }
 }

@@ -20,14 +20,14 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="<?= base_url() ?>">Blog App</a>
+            <a class="navbar-brand" href="<?= site_url() ?>">Blog App</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= base_url('posts') ?>">Home</a>
+                        <a class="nav-link" href="<?= site_url('posts') ?>">Home</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">
@@ -37,17 +37,17 @@
                                 <?= htmlspecialchars($this->session->userdata('username'), ENT_QUOTES, 'UTF-8') ?>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="<?= base_url('profile') ?>">Profile</a></li>
+                                <li><a class="dropdown-item" href="<?= site_url('profile') ?>">Profile</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="<?= base_url('auth/logout') ?>">Logout</a></li>
+                                <li><a class="dropdown-item" href="<?= site_url('auth/login') ?>">Logout</a></li>
                             </ul>
                         </li>
                     <?php else: ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('auth/login') ?>">Login</a>
+                            <a class="nav-link" href="<?= site_url('auth/login') ?>">Login</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="<?= base_url('auth/register') ?>">Register</a>
+                            <a class="nav-link" href="<?= site_url('auth/register') ?>">Register</a>
                         </li>
                     <?php endif; ?>
                 </ul>

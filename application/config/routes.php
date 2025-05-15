@@ -69,6 +69,11 @@ $route['posts/edit/(:num)'] = 'PostsController/edit/$1';
 $route['posts/update/(:num)'] = 'PostsController/update/$1';
 $route['posts/delete/(:num)'] = 'PostsController/delete/$1';
 
+// User routes
+$route['profile'] = 'UserController/profile';
+$route['user/profile'] = 'UserController/profile';
+$route['user/update-profile'] = 'UserController/updateProfile';
+
 $route['default_controller'] = 'welcome';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;

@@ -4,3 +4,21 @@
 <IfModule !authz_core_module>
     Deny from all
 </IfModule>
+
+# Protect direct access to uploaded files
+# Place this .htaccess file in the uploads/profiles directory
+
+# Allow specific image files
+<FilesMatch "\.(jpg|jpeg|png|gif)$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
+
+# Deny all other files
+<FilesMatch "\.(?!jpg|jpeg|png|gif).*$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Prevent directory listing
+Options -Indexes
