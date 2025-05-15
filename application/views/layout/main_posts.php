@@ -10,9 +10,7 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <!-- Custom Styles -->
-    <style>
 
-    </style>
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="<?= base_url('assets/css/posts-styles.css'); ?>">
@@ -23,7 +21,7 @@
         <!-- Sidebar -->
         <nav id="sidebar">
             <div class="sidebar-header">
-                <h3><i class="bi bi-journal-bookmark"></i> Logo</h3>
+                <h3><i class="bi bi-journal-bookmark"></i> <span>Logo</span></h3>
             </div>
 
             <?php if ($this->session->userdata('isLoggedIn')): ?>
@@ -44,9 +42,9 @@
             <?php endif; ?>
 
             <ul class="list-unstyled components">
-                <li class="active">
-                    <a href="<?= site_url('posts') ?>">
-                        <i class="bi bi-grid sidebar-icon"></i>Feed
+                <li>
+                    <a href="<?= site_url('posts/create') ?>">
+                        <i class="bi bi-grid sidebar-icon"></i><span>Feed</span>
                         <?php if(isset($post_count) && $post_count > 0): ?>
                             <span class="nav-count"><?= $post_count ?></span>
                         <?php elseif($this->session->userdata('post_count') && $this->session->userdata('post_count') > 0): ?>
@@ -54,22 +52,22 @@
                         <?php endif; ?>
                     </a>
                 </li>
-                <li>
-                    <a href="<?= site_url('posts/create') ?>">
-                        <i class="bi bi-file-earmark-text sidebar-icon"></i>Post
+                <li class="active">
+                    <a href="<?= site_url('posts') ?>">
+                        <i class="bi bi-file-earmark-text sidebar-icon"></i><span>Post</span>
                     </a>
                 </li>
                 <?php if ($this->session->userdata('isLoggedIn')): ?>
                     <li>
                         <a href="#commentSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
-                            <i class="bi bi-chat-left-text sidebar-icon"></i>Comments
+                            <i class="bi bi-chat-left-text sidebar-icon"></i><span>Comments</span>
                         </a>
                         <ul class="collapse list-unstyled" id="commentSubmenu">
                             <li>
-                                <a href="<?= site_url('comments/my-comments') ?>">My Comments</a>
+                                <a href="<?= site_url('comments/my-comments') ?>"><span>My Comments</span></a>
                             </li>
                             <li>
-                                <a href="<?= site_url('comments/received') ?>">Received Comments</a>
+                                <a href="<?= site_url('comments/received') ?>"><span>Received Comments</span></a>
                             </li>
                         </ul>
                     </li>
@@ -78,14 +76,18 @@
 
             <?php if ($this->session->userdata('isLoggedIn')): ?>
                 <div class="sidebar-footer">
-                    <a href="<?= site_url('auth/login') ?>" class="btn btn-outline-danger btn-sm w-100">
-                        <i class="bi bi-box-arrow-right"></i> Logout
+                    <a href="<?= site_url('auth/logout') ?>" class="btn btn-outline-danger btn-sm w-100">
+                        <i class="bi bi-box-arrow-right"></i> <span>Logout</span>
                     </a>
                 </div>
             <?php else: ?>
                 <div class="sidebar-footer">
-                    <a href="<?= site_url('auth/login') ?>" class="btn btn-primary btn-sm w-100 mb-2">Login</a>
-                    <a href="<?= site_url('auth/register') ?>" class="btn btn-outline-primary btn-sm w-100">Register</a>
+                    <a href="<?= site_url('auth/login') ?>" class="btn btn-primary btn-sm w-100 mb-2">
+                        <i class="bi bi-box-arrow-in-right"></i> <span>Login</span>
+                    </a>
+                    <a href="<?= site_url('auth/register') ?>" class="btn btn-outline-primary btn-sm w-100">
+                        <i class="bi bi-person-plus"></i> <span>Register</span>
+                    </a>
                 </div>
             <?php endif; ?>
         </nav>
@@ -97,7 +99,7 @@
                     <button type="button" id="sidebarCollapse" aria-label="Toggle Sidebar">
                         <i class="bi bi-list"></i>
                     </button>
-                    <h4 class="m-0"><?= isset($title) ? $title : 'POST' ?></h4>
+                    <h4 class="m-0">POST</h4>
 
                     <div class="ms-auto d-flex align-items-center">
                         <button class="btn btn-link position-relative me-3" aria-label="Theme Toggle">
@@ -120,7 +122,7 @@
                                     <li>
                                         <hr class="dropdown-divider">
                                     </li>
-                                    <li><a class="dropdown-item" href="<?= site_url('auth/login') ?>">Logout</a></li>
+                                    <li><a class="dropdown-item" href="<?= site_url('auth/logout') ?>">Logout</a></li>
                                 </ul>
                             </div>
                         <?php else: ?>
@@ -166,29 +168,64 @@
 
     <!-- Custom Script for Sidebar Toggle -->
     <script>
-  $(document).ready(function () {
-    $('#sidebarCollapse').on('click', function () {
-        $('#sidebar').toggleClass('active');
-        $('#content').toggleClass('active');
-        // Removed: $('.overlay').toggleClass('active');
-    });
+        $(document).ready(function () {
+            // Check if we're on mobile
+            const isMobile = function() {
+                return window.innerWidth <= 768;
+            };
+            
+            // Toggle sidebar with different behavior on mobile vs desktop
+            $('#sidebarCollapse').on('click', function () {
+                if (isMobile()) {
+                    // On mobile, we'll still use the full hide/show behavior
+                    $('#sidebar').toggleClass('active');
+                    $('#content').toggleClass('active');
+                    $('.overlay').toggleClass('active');
+                } else {
+                    // On desktop, toggle between full sidebar and icon-only sidebar
+                    $('#sidebar').toggleClass('active');
+                    $('#content').toggleClass('active');
+                    // Don't show overlay on desktop
+                    $('.overlay').removeClass('active');
+                }
+            });
 
-    // Removed overlay click handler
-    /*
-    $('.overlay').on('click', function () {
-        $('#sidebar').removeClass('active');
-        $('#content').removeClass('active');
-        $('.overlay').removeClass('active');
-    });
-    */
+            // Handle window resize
+            $(window).resize(function() {
+                if (!isMobile()) {
+                    // Remove mobile-specific classes if window is resized larger
+                    $('#sidebar').removeClass('mobile');
+                    $('#content').removeClass('mobile');
+                    $('.overlay').removeClass('active');
+                }
+            });
 
-    // Handle collapsible menu items
-    $('#sidebar .dropdown-toggle').on('click', function (e) {
-        e.preventDefault();
-        $(this).parent().toggleClass('menu-open');
-        $(this).attr('aria-expanded', $(this).parent().hasClass('menu-open'));
-    });
-});
+            // Handle overlay click (mobile only)
+            $('.overlay').on('click', function () {
+                $('#sidebar').removeClass('active');
+                $('#content').removeClass('active');
+                $('.overlay').removeClass('active');
+            });
+
+            // Handle collapsible menu items
+            $('#sidebar .dropdown-toggle').on('click', function (e) {
+                e.preventDefault();
+                // Only expand submenu if sidebar is not in collapsed state
+                if (!$('#sidebar').hasClass('active')) {
+                    $(this).parent().toggleClass('menu-open');
+                    $(this).attr('aria-expanded', $(this).parent().hasClass('menu-open'));
+                } else {
+                    // If sidebar is collapsed, we should first expand it
+                    $('#sidebar').removeClass('active');
+                    $('#content').removeClass('active');
+                    // Then open the submenu after a slight delay
+                    setTimeout(() => {
+                        $(this).parent().addClass('menu-open');
+                        $(this).attr('aria-expanded', true);
+                    }, 300);
+                }
+            });
+        });
     </script>
 </body>
 
