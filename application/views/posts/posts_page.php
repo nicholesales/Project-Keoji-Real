@@ -152,27 +152,79 @@ echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featu
     color: #dc2626;
 }
 
-/* Featured posts section */
-.featured-post-container {
+/* Featured posts carousel styling */
+.featured-post-carousel {
     background: white;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 24px;
 }
 
-.featured-post-header {
+.featured-post-carousel .carousel-inner {
     padding: 20px;
-    border-bottom: 1px solid #f0f0f0;
 }
 
-.featured-post-header h2 {
-    font-size: 1.2rem;
-    font-weight: 500;
-    margin: 0;
+/* Formal fade-right transition */
+.carousel-item {
+    transition: opacity 0.7s ease-in-out, transform 0.7s ease-in-out;
+    opacity: 0;
+    transform: translateX(30px);
 }
 
-.featured-post-content {
-    padding: 20px;
+.carousel-item.active {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Transparent carousel controls with hover effect */
+.carousel-control-prev,
+.carousel-control-next {
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+    margin: 0 15px;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    width: 24px;
+    height: 24px;
+    filter: drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.3));
+}
+
+.carousel-indicators {
+    bottom: -5px;
+}
+
+.carousel-indicators [data-bs-target] {
+    background-color: #dc2626;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin: 0 4px;
+    opacity: 0.5;
+    transition: opacity 0.2s ease;
+}
+
+.carousel-indicators .active {
+    opacity: 1;
+}
+
+.featured-post-empty {
+    padding: 40px 20px;
+    text-align: center;
 }
 
 .featured-post-item {
@@ -189,6 +241,23 @@ echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featu
     flex-shrink: 0;
 }
 
+/* For carousel without images - show a backup colored div */
+.featured-post-placeholder {
+    width: 150px;
+    height: 100px;
+    background-color: #dc2626;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+}
+
+.featured-post-placeholder i {
+    font-size: 32px;
+}
+
 .featured-post-details {
     flex: 1;
 }
@@ -198,6 +267,16 @@ echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featu
     font-weight: 500;
     margin-bottom: 8px;
     color: #333;
+}
+
+.featured-post-title a {
+    color: #333;
+    text-decoration: none;
+}
+
+.featured-post-title a:hover {
+    color: #dc2626;
+    text-decoration: underline;
 }
 
 .featured-post-snippet {
@@ -277,6 +356,12 @@ echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featu
         width: 100%;
         height: 200px;
     }
+    
+    .featured-post-placeholder {
+        width: 100%;
+        height: 120px;
+        margin-bottom: 15px;
+    }
 }
 </style>
 
@@ -335,49 +420,83 @@ echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featu
         <?php endif; ?>
     </div>
 
-    <!-- Featured Posts Section -->
+    <!-- Featured Posts Section with Carousel -->
     <div class="section-header">
-        <h2>Featured Post</h2>
+        <h2>Featured Posts</h2>
     </div>
     
-    <div class="featured-post-container">
-        <?php if(empty($featuredPosts)): ?>
-            <div class="empty-state">
+    <?php if(empty($featuredPosts)): ?>
+        <div class="featured-post-carousel">
+            <div class="featured-post-empty">
                 <i class="bi bi-star"></i>
                 <p>No featured posts yet. Mark a post as featured to see it here!</p>
             </div>
-        <?php else: ?>
-            <?php foreach($featuredPosts as $post): ?>
-                <div class="featured-post-content">
-                    <div class="featured-post-item">
-                        <?php if(!empty($post['image'])): ?>
-                        <img src="<?= base_url('uploads/posts/' . $post['image']) ?>" 
-                             class="featured-post-image" 
-                             alt="<?= htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8') ?>">
-                        <?php endif; ?>
-                        <div class="featured-post-details">
-                            <small class="text-muted mb-2 d-block">
-                                Featured post with tag #<?= htmlspecialchars($post['category'], ENT_QUOTES, 'UTF-8') ?>
-                            </small>
-                            <h3 class="featured-post-title">
-                                <?= htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8') ?>
-                            </h3>
-                            <p class="featured-post-snippet">
-                                <?= substr(htmlspecialchars($post['description'], ENT_QUOTES, 'UTF-8'), 0, 150) . (strlen($post['description']) > 150 ? '...' : '') ?>
-                            </p>
-                            <div class="featured-post-footer">
-                                <div class="featured-post-stats">
-                                    <span><i class="bi bi-heart"></i> <?= rand(500, 9999) ?></span>
-                                    <span><i class="bi bi-chat"></i> <?= rand(50, 999) ?></span>
-                                    <span><i class="bi bi-eye"></i> <?= number_format(rand(1000, 9999)) ?>k</span>
+        </div>
+    <?php else: ?>
+        <!-- Bootstrap carousel implementation with formal fade-right transition -->
+        <div id="featuredPostCarousel" class="carousel slide featured-post-carousel" data-bs-ride="carousel">
+            <!-- Carousel indicators -->
+            <div class="carousel-indicators">
+                <?php foreach($featuredPosts as $index => $post): ?>
+                    <button type="button" 
+                        data-bs-target="#featuredPostCarousel" 
+                        data-bs-slide-to="<?= $index ?>" 
+                        <?= $index === 0 ? 'class="active" aria-current="true"' : '' ?> 
+                        aria-label="Slide <?= $index + 1 ?>">
+                    </button>
+                <?php endforeach; ?>
+            </div>
+            
+            <!-- Carousel items with fade-right transition -->
+            <div class="carousel-inner">
+                <?php foreach($featuredPosts as $index => $post): ?>
+                    <div class="carousel-item <?= $index === 0 ? 'active' : '' ?>">
+                        <div class="featured-post-item">
+                            <?php if(!empty($post['image'])): ?>
+                                <img src="<?= base_url('uploads/posts/' . $post['image']) ?>" 
+                                    class="featured-post-image" 
+                                    alt="<?= htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8') ?>">
+                            <?php else: ?>
+                                <div class="featured-post-placeholder">
+                                    <i class="bi bi-file-earmark-text"></i>
+                                </div>
+                            <?php endif; ?>
+                            <div class="featured-post-details">
+                                <small class="text-muted mb-2 d-block">
+                                    Featured post with tag #<?= htmlspecialchars($post['category'], ENT_QUOTES, 'UTF-8') ?>
+                                </small>
+                                <h3 class="featured-post-title">
+                                    <a href="<?= site_url('posts/view/' . $post['post_id']) ?>">
+                                        <?= htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8') ?>
+                                    </a>
+                                </h3>
+                                <p class="featured-post-snippet">
+                                    <?= substr(htmlspecialchars($post['description'], ENT_QUOTES, 'UTF-8'), 0, 150) . (strlen($post['description']) > 150 ? '...' : '') ?>
+                                </p>
+                                <div class="featured-post-footer">
+                                    <div class="featured-post-stats">
+                                        <span><i class="bi bi-heart"></i> <?= rand(500, 9999) ?></span>
+                                        <span><i class="bi bi-chat"></i> <?= rand(50, 999) ?></span>
+                                        <span><i class="bi bi-eye"></i> <?= number_format(rand(1000, 9999)) ?>k</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            <?php endforeach; ?>
-        <?php endif; ?>
-    </div>
+                <?php endforeach; ?>
+            </div>
+            
+            <!-- Transparent carousel controls -->
+            <button class="carousel-control-prev" type="button" data-bs-target="#featuredPostCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#featuredPostCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    <?php endif; ?>
 </div>
 
 <!-- Post Modal -->
@@ -467,6 +586,84 @@ $(document).ready(function() {
     $('#postForm').off('submit');
     $('#saveDraftBtn').off('click');
     $('#publishBtn').off('click');
+    
+    // Initialize the featured posts carousel
+    const featuredCarousel = $('#featuredPostCarousel');
+    if (featuredCarousel.length) {
+        // Initialize with Bootstrap 5 syntax if available
+        if (typeof bootstrap !== 'undefined') {
+            const carousel = new bootstrap.Carousel(document.getElementById('featuredPostCarousel'), {
+                interval: 5000,  // 5 seconds per slide
+                wrap: true,      // Continuous loop
+                touch: true      // Enable touch swiping
+            });
+        } else {
+            // Fallback to jQuery method for Bootstrap 4
+            featuredCarousel.carousel({
+                interval: 5000,
+                wrap: true
+            });
+        }
+        
+        // Add swipe support for touch devices
+        if ('ontouchstart' in window) {
+            let startX, endX;
+            const carousel = document.getElementById('featuredPostCarousel');
+            
+            carousel.addEventListener('touchstart', function(e) {
+                startX = e.touches[0].pageX;
+            }, { passive: true });
+            
+            carousel.addEventListener('touchmove', function(e) {
+                endX = e.touches[0].pageX;
+            }, { passive: true });
+            
+            carousel.addEventListener('touchend', function(e) {
+                const threshold = 100; // Minimum distance for swipe
+                const diff = startX - endX;
+                
+                if (Math.abs(diff) >= threshold) {
+                    if (diff > 0) {
+                        // Swiped left, go to next slide
+                        if (typeof bootstrap !== 'undefined') {
+                            const carouselInstance = bootstrap.Carousel.getInstance(carousel);
+                            carouselInstance.next();
+                        } else {
+                            $(carousel).carousel('next');
+                        }
+                    } else {
+                        // Swiped right, go to previous slide
+                        if (typeof bootstrap !== 'undefined') {
+                            const carouselInstance = bootstrap.Carousel.getInstance(carousel);
+                            carouselInstance.prev();
+                        } else {
+                            $(carousel).carousel('prev');
+                        }
+                    }
+                }
+            }, { passive: true });
+        }
+        
+        // Enhance the fade-right transition
+        featuredCarousel.on('slide.bs.carousel', function(e) {
+            const $nextSlide = $(e.relatedTarget);
+            const direction = e.direction === 'left' ? 1 : -1;
+            
+            // Set initial state for the next slide
+            $nextSlide.css({
+                'transform': `translateX(${30 * direction}px)`,
+                'opacity': '0'
+            });
+            
+            // After a brief delay, animate to visible state
+            setTimeout(function() {
+                $nextSlide.css({
+                    'transform': 'translateX(0)',
+                    'opacity': '1'
+                });
+            }, 50);
+        });
+    }
     
     // Tab switching functionality
     $('.tab-link').click(function(e) {
