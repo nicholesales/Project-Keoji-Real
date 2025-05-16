@@ -4,367 +4,6 @@ echo '<!-- Debug: recentPosts count: ' . (isset($recentPosts) ? count($recentPos
 echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featuredPosts) : 'not set') . ' -->';
 ?>
 
-<style>
-/* Custom styles for posts page */
-.blog-posts-section {
-    padding: 20px;
-}
-
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.section-header h2 {
-    font-size: 1.2rem;
-    font-weight: 500;
-    margin: 0;
-}
-
-.new-post-btn {
-    background-color: #dc2626;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.new-post-btn:hover {
-    background-color: #b91c1c;
-}
-
-/* Posts cards */
-.posts-container {
-    background: white;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    margin-bottom: 24px;
-}
-
-.post-item {
-    display: flex;
-    align-items: flex-start;
-    padding: 16px 0;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.post-item:last-child {
-    border-bottom: none;
-}
-
-.post-icon {
-    width: 48px;
-    height: 48px;
-    background-color: #dc2626;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 16px;
-    flex-shrink: 0;
-}
-
-.post-icon i {
-    color: white;
-    font-size: 24px;
-}
-
-.post-content {
-    flex: 1;
-}
-
-.post-title {
-    font-size: 1rem;
-    font-weight: 500;
-    margin-bottom: 4px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.post-title a {
-    color: #333;
-    text-decoration: none;
-}
-
-.post-title a:hover {
-    text-decoration: underline;
-}
-
-.post-meta {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #666;
-    font-size: 0.875rem;
-}
-
-.status-badge {
-    font-size: 0.75rem;
-    padding: 2px 8px;
-    border-radius: 12px;
-}
-
-.status-badge.published {
-    background-color: #10b981;
-    color: white;
-}
-
-.status-badge.draft {
-    background-color: #6b7280;
-    color: white;
-}
-
-.post-actions {
-    display: flex;
-    gap: 8px;
-    margin-left: auto;
-}
-
-.action-btn {
-    background: none;
-    border: none;
-    color: #666;
-    cursor: pointer;
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 4px;
-    transition: all 0.2s;
-}
-
-.action-btn:hover {
-    background-color: #f5f5f5;
-}
-
-.action-btn.delete:hover {
-    color: #dc2626;
-}
-
-/* Featured posts carousel styling */
-.featured-post-carousel {
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    margin-bottom: 24px;
-}
-
-.featured-post-carousel .carousel-inner {
-    padding: 20px;
-}
-
-/* Formal fade-right transition */
-.carousel-item {
-    transition: opacity 0.7s ease-in-out, transform 0.7s ease-in-out;
-    opacity: 0;
-    transform: translateX(30px);
-}
-
-.carousel-item.active {
-    opacity: 1;
-    transform: translateX(0);
-}
-
-/* Transparent carousel controls with hover effect */
-.carousel-control-prev,
-.carousel-control-next {
-    width: 40px;
-    height: 40px;
-    background: transparent;
-    border-radius: 50%;
-    top: 50%;
-    transform: translateY(-50%);
-    opacity: 0.6;
-    transition: opacity 0.2s ease;
-    margin: 0 15px;
-}
-
-.carousel-control-prev:hover,
-.carousel-control-next:hover {
-    opacity: 1;
-    background: rgba(0, 0, 0, 0.1);
-}
-
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-    width: 24px;
-    height: 24px;
-    filter: drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.3));
-}
-
-.carousel-indicators {
-    bottom: -5px;
-}
-
-.carousel-indicators [data-bs-target] {
-    background-color: #dc2626;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    margin: 0 4px;
-    opacity: 0.5;
-    transition: opacity 0.2s ease;
-}
-
-.carousel-indicators .active {
-    opacity: 1;
-}
-
-.featured-post-empty {
-    padding: 40px 20px;
-    text-align: center;
-}
-
-.featured-post-item {
-    display: flex;
-    gap: 20px;
-    align-items: start;
-}
-
-.featured-post-image {
-    width: 150px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 4px;
-    flex-shrink: 0;
-}
-
-/* For carousel without images - show a backup colored div */
-.featured-post-placeholder {
-    width: 150px;
-    height: 100px;
-    background-color: #dc2626;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    flex-shrink: 0;
-}
-
-.featured-post-placeholder i {
-    font-size: 32px;
-}
-
-.featured-post-details {
-    flex: 1;
-}
-
-.featured-post-title {
-    font-size: 1.1rem;
-    font-weight: 500;
-    margin-bottom: 8px;
-    color: #333;
-}
-
-.featured-post-title a {
-    color: #333;
-    text-decoration: none;
-}
-
-.featured-post-title a:hover {
-    color: #dc2626;
-    text-decoration: underline;
-}
-
-.featured-post-snippet {
-    color: #666;
-    font-size: 0.875rem;
-    line-height: 1.5;
-    margin-bottom: 12px;
-}
-
-.featured-post-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.featured-post-stats {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    font-size: 0.875rem;
-    color: #666;
-}
-
-.featured-post-stats i {
-    margin-right: 4px;
-}
-
-.featured-post-date {
-    font-size: 0.875rem;
-    color: #999;
-}
-
-/* Empty states */
-.empty-state {
-    text-align: center;
-    color: #666;
-    padding: 40px 20px;
-}
-
-.empty-state i {
-    font-size: 48px;
-    color: #ddd;
-    margin-bottom: 16px;
-}
-
-.tabs-nav {
-    display: flex;
-    gap: 24px;
-    margin-bottom: 20px;
-}
-
-.tab-link {
-    padding: 8px 0;
-    border-bottom: 2px solid transparent;
-    color: #666;
-    text-decoration: none;
-    font-size: 0.95rem;
-    transition: all 0.2s;
-}
-
-.tab-link.active {
-    color: #dc2626;
-    border-bottom-color: #dc2626;
-}
-
-.tab-link:hover {
-    color: #333;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .featured-post-item {
-        flex-direction: column;
-    }
-    
-    .featured-post-image {
-        width: 100%;
-        height: 200px;
-    }
-    
-    .featured-post-placeholder {
-        width: 100%;
-        height: 120px;
-        margin-bottom: 15px;
-    }
-}
-</style>
-
 <div class="blog-posts-section">
     <!-- Tabs Navigation -->
     <div class="tabs-nav">
@@ -433,7 +72,7 @@ echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featu
             </div>
         </div>
     <?php else: ?>
-        <!-- Bootstrap carousel implementation with formal fade-right transition -->
+        <!-- Bootstrap carousel implementation with enhanced fade-right transition -->
         <div id="featuredPostCarousel" class="carousel slide featured-post-carousel" data-bs-ride="carousel">
             <!-- Carousel indicators -->
             <div class="carousel-indicators">
@@ -447,7 +86,7 @@ echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featu
                 <?php endforeach; ?>
             </div>
             
-            <!-- Carousel items with fade-right transition -->
+            <!-- Carousel items with enhanced fade-right transition -->
             <div class="carousel-inner">
                 <?php foreach($featuredPosts as $index => $post): ?>
                     <div class="carousel-item <?= $index === 0 ? 'active' : '' ?>">
@@ -486,7 +125,7 @@ echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featu
                 <?php endforeach; ?>
             </div>
             
-            <!-- Transparent carousel controls -->
+            <!-- Enhanced transparent carousel controls -->
             <button class="carousel-control-prev" type="button" data-bs-target="#featuredPostCarousel" data-bs-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                 <span class="visually-hidden">Previous</span>
@@ -499,7 +138,7 @@ echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featu
     <?php endif; ?>
 </div>
 
-<!-- Post Modal -->
+<!-- Enhanced Post Modal with Animation -->
 <div class="modal fade" id="postModal" tabindex="-1" aria-labelledby="postModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -514,13 +153,13 @@ echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featu
                     
                     <div class="mb-3">
                         <label for="title" class="form-label">Title</label>
-                        <input type="text" class="form-control" id="title" name="title" placeholder="Input text" required>
+                        <input type="text" class="form-control" id="title" name="title" placeholder="Enter post title" required>
                     </div>
                     
                     <div class="mb-3">
                         <label for="category" class="form-label">Category</label>
                         <select class="form-select" id="category" name="category" required>
-                            <option value="">Dropdown</option>
+                            <option value="">Select a category</option>
                             <?php foreach($categories as $category): ?>
                                 <option value="<?= $category ?>"><?= $category ?></option>
                             <?php endforeach; ?>
@@ -529,12 +168,16 @@ echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featu
                     
                     <div class="mb-3">
                         <label for="content" class="form-label">Content</label>
-                        <textarea class="form-control" id="content" name="content" rows="5" placeholder="Input text" required></textarea>
+                        <textarea class="form-control" id="content" name="content" rows="3" placeholder="Write your post content here" required></textarea>
                     </div>
                     
                     <div class="mb-3">
-                        <label for="image" class="form-label">Image</label>
-                        <input type="file" class="form-control" id="image" name="image" accept=".jpg,.jpeg,.png" required>
+                        <label class="form-label d-block">Image</label>
+                        <label for="image" class="custom-file-upload">
+                            <i class="bi bi-cloud-upload"></i> Choose Image
+                        </label>
+                        <input type="file" class="form-control" id="image" name="image" accept=".jpg,.jpeg,.png">
+                        <small class="text-muted">Optional: Upload a featured image for your post</small>
                         <div id="imagePreviewContainer" class="mt-2 d-none">
                             <img id="imagePreview" class="img-thumbnail" style="max-height: 200px;">
                         </div>
@@ -557,7 +200,7 @@ echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featu
     </div>
 </div>
 
-<!-- Modal for Delete Confirmation -->
+<!-- Enhanced Modal for Delete Confirmation -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -566,7 +209,11 @@ echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featu
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Are you sure you want to delete this post? This action cannot be undone.
+                <div class="text-center mb-3">
+                    <i class="bi bi-exclamation-triangle text-danger" style="font-size: 48px;"></i>
+                </div>
+                <p class="text-center">Are you sure you want to delete this post?</p>
+                <p class="text-center text-muted small">This action cannot be undone.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -587,7 +234,7 @@ $(document).ready(function() {
     $('#saveDraftBtn').off('click');
     $('#publishBtn').off('click');
     
-    // Initialize the featured posts carousel
+    // Initialize the featured posts carousel with enhanced animations
     const featuredCarousel = $('#featuredPostCarousel');
     if (featuredCarousel.length) {
         // Initialize with Bootstrap 5 syntax if available
@@ -644,7 +291,7 @@ $(document).ready(function() {
             }, { passive: true });
         }
         
-        // Enhance the fade-right transition
+        // Enhance the fade-right transition with smoother animations
         featuredCarousel.on('slide.bs.carousel', function(e) {
             const $nextSlide = $(e.relatedTarget);
             const direction = e.direction === 'left' ? 1 : -1;
@@ -665,41 +312,70 @@ $(document).ready(function() {
         });
     }
     
-    // Tab switching functionality
+    // Tab switching functionality with animation
     $('.tab-link').click(function(e) {
         e.preventDefault();
         $('.tab-link').removeClass('active');
         $(this).addClass('active');
+        
+        // Add a subtle animation to indicate the tab change
+        $('.posts-container').addClass('fade').fadeOut(200).fadeIn(300).removeClass('fade');
         
         // Here you could filter posts based on the selected tab
         const filter = $(this).attr('href').substring(1);
         // Implement filtering logic here if needed
     });
     
-    // Open modal for new post
+    // Open modal for new post with animation
     $('#newPostBtn').click(function() {
         $('#postModalLabel').text('Create New Post');
         $('#postForm')[0].reset();
         $('#post_id').val('');
         $('#imagePreviewContainer').addClass('d-none');
-        $('#image').attr('required', true);
         $('#postModal').modal('show');
+        
+        // Add a slight entrance animation for form elements
+        $('.modal-body .mb-3').each(function(index) {
+            $(this).css({
+                'opacity': '0',
+                'transform': 'translateY(20px)'
+            });
+            
+            setTimeout(() => {
+                $(this).css({
+                    'transition': 'all 0.3s ease',
+                    'opacity': '1',
+                    'transform': 'translateY(0)'
+                });
+            }, 100 + (index * 50));
+        });
     });
     
-    // Preview image
+    // Enhance image preview with animation
     $('#image').change(function() {
         const file = this.files[0];
         if (file) {
             const reader = new FileReader();
             reader.onload = function(e) {
                 $('#imagePreview').attr('src', e.target.result);
-                $('#imagePreviewContainer').removeClass('d-none');
+                $('#imagePreviewContainer').removeClass('d-none').css({
+                    'opacity': '0',
+                    'transform': 'scale(0.9)'
+                });
+                
+                setTimeout(() => {
+                    $('#imagePreviewContainer').css({
+                        'transition': 'all 0.3s ease',
+                        'opacity': '1',
+                        'transform': 'scale(1)'
+                    });
+                }, 10);
             }
             reader.readAsDataURL(file);
         }
     });
     
-    // Form submission handler
+    // Form submission handler with improved UI feedback
     $('#postForm').on('submit', function(e) {
         console.log('Form submit event triggered');
         e.preventDefault();
@@ -709,20 +385,34 @@ $(document).ready(function() {
         submitPost(status);
     });
     
-    // Handle save as draft
+    // Handle save as draft with button animation
     $('#saveDraftBtn').on('click', function(e) {
         console.log('Save Draft button clicked');
         e.preventDefault();
         e.stopPropagation();
+        
+        // Add button press animation
+        $(this).addClass('active').css('transform', 'scale(0.95)');
+        setTimeout(() => {
+            $(this).removeClass('active').css('transform', '');
+        }, 200);
+        
         $('#postForm').data('submit-type', 'draft');
         $('#postForm').submit();
     });
     
-    // Handle publish
+    // Handle publish with button animation
     $('#publishBtn').on('click', function(e) {
         console.log('Publish button clicked');
         e.preventDefault();
         e.stopPropagation();
+        
+        // Add button press animation
+        $(this).addClass('active').css('transform', 'scale(0.95)');
+        setTimeout(() => {
+            $(this).removeClass('active').css('transform', '');
+        }, 200);
+        
         $('#postForm').data('submit-type', 'published');
         $('#postForm').submit();
     });
@@ -730,7 +420,7 @@ $(document).ready(function() {
     // Add isSubmitting flag to prevent multiple submissions
     let isSubmitting = false;
     
-    // Submit post function
+    // Enhanced submit post function with better UX
     function submitPost(status) {
         // Prevent multiple submissions
         if (isSubmitting) {
@@ -741,14 +431,24 @@ $(document).ready(function() {
         // Validate form
         if (!$('#postForm')[0].checkValidity()) {
             $('#postForm')[0].reportValidity();
+            
+            // Shake animation for invalid fields
+            $('.form-control:invalid, .form-select:invalid').css('animation', 'shake 0.5s');
+            setTimeout(() => {
+                $('.form-control, .form-select').css('animation', '');
+            }, 500);
+            
             return;
         }
         
         // Set flag to prevent multiple submissions
         isSubmitting = true;
         
-        // Disable buttons during submission
+        // Show loading state on buttons
         $('#saveDraftBtn, #publishBtn').prop('disabled', true);
+        const activeBtn = status === 'draft' ? $('#saveDraftBtn') : $('#publishBtn');
+        const originalText = activeBtn.html();
+        activeBtn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...');
         
         // Create form data
         const formData = new FormData($('#postForm')[0]);
@@ -766,7 +466,7 @@ $(document).ready(function() {
             : '<?= site_url("PostsController/create") ?>';
         console.log('Submitting to URL:', url);
         
-        // Submit form
+        // Submit form with improved error handling
         $.ajax({
             url: url,
             type: 'POST',
@@ -777,14 +477,29 @@ $(document).ready(function() {
             success: function(response) {
                 console.log('Success response:', response);
                 isSubmitting = false;
-                $('#saveDraftBtn, #publishBtn').prop('disabled', false);
                 
                 if (response.success) {
-                    // Close modal and refresh page
-                    $('#postModal').modal('hide');
-                    location.reload();
+                    // Show success animation before closing modal
+                    $('#postModal .modal-content').append(
+                        '<div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-90" style="z-index: 1050; animation: fadeIn 0.3s;">' +
+                        '<div class="text-center">' +
+                        '<i class="bi bi-check-circle text-success" style="font-size: 48px; animation: scaleIn 0.5s;"></i>' +
+                        '<h5 class="mt-3">Post ' + (postId ? 'Updated' : 'Created') + ' Successfully!</h5>' +
+                        '</div>' +
+                        '</div>'
+                    );
+                    
+                    // Close modal and refresh page after delay
+                    setTimeout(function() {
+                        $('#postModal').modal('hide');
+                        location.reload();
+                    }, 1200);
                 } else {
-                    // Display errors
+                    // Reset button state
+                    $('#saveDraftBtn, #publishBtn').prop('disabled', false);
+                    activeBtn.html(originalText);
+                    
+                    // Display errors with animation
                     console.error('Error response:', response);
                     let errorMessage = 'Error: ';
                     if (response.errors) {
@@ -792,7 +507,28 @@ $(document).ready(function() {
                     } else {
                         errorMessage += response.message || 'Unknown error';
                     }
-                    alert(errorMessage);
+                    
+                    // Create animated error toast
+                    $('body').append(
+                        '<div class="position-fixed top-0 end-0 p-3" style="z-index: 9999">' +
+                        '<div class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">' +
+                        '<div class="d-flex">' +
+                        '<div class="toast-body">' + errorMessage + '</div>' +
+                        '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>'
+                    );
+                    
+                    // Show toast with Bootstrap 5
+                    if (typeof bootstrap !== 'undefined') {
+                        const toastEl = document.querySelector('.toast');
+                        const toast = new bootstrap.Toast(toastEl, { delay: 5000 });
+                        toast.show();
+                    } else {
+                        // Fallback for Bootstrap 4
+                        $('.toast').toast({ delay: 5000 }).toast('show');
+                    }
                 }
             },
             error: function(xhr, status, error) {
@@ -802,16 +538,47 @@ $(document).ready(function() {
                     responseText: xhr.responseText,
                     error: error
                 });
-                alert('An error occurred. Status: ' + xhr.status + '. Please check console for details.');
+                
+                // Reset button state
                 isSubmitting = false;
                 $('#saveDraftBtn, #publishBtn').prop('disabled', false);
+                activeBtn.html(originalText);
+                
+                // Create animated error toast
+                $('body').append(
+                    '<div class="position-fixed top-0 end-0 p-3" style="z-index: 9999">' +
+                    '<div class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">' +
+                    '<div class="d-flex">' +
+                    '<div class="toast-body">An error occurred. Status: ' + xhr.status + '. Please check console for details.</div>' +
+                    '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>'
+                );
+                
+                // Show toast with Bootstrap 5
+                if (typeof bootstrap !== 'undefined') {
+                    const toastEl = document.querySelector('.toast');
+                    const toast = new bootstrap.Toast(toastEl, { delay: 5000 });
+                    toast.show();
+                } else {
+                    // Fallback for Bootstrap 4
+                    $('.toast').toast({ delay: 5000 }).toast('show');
+                }
             }
         });
     }
     
-    // Edit post
+    // Enhanced edit post with animations
     $(document).on('click', '.edit-post', function() {
         const postId = $(this).data('id');
+        
+        // Add loading animation to the post item
+        const postItem = $(this).closest('.post-item');
+        postItem.css({
+            'position': 'relative',
+            'overflow': 'hidden'
+        }).append('<div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-light bg-opacity-50"><div class="spinner-border text-primary" role="status"></div></div>');
         
         // Fetch post data
         $.ajax({
@@ -819,6 +586,13 @@ $(document).ready(function() {
             type: 'GET',
             dataType: 'json',
             success: function(response) {
+                // Remove loading animation
+                postItem.find('.position-absolute').remove();
+                postItem.css({
+                    'position': '',
+                    'overflow': ''
+                });
+                
                 if (response.success) {
                     const post = response.post;
                     
@@ -830,35 +604,126 @@ $(document).ready(function() {
                     $('#content').val(post.description);
                     $('#featured').prop('checked', post.featured == 1);
                     
-                    // Show image preview
-                    $('#imagePreview').attr('src', '<?= base_url("uploads/posts") ?>/' + post.image);
-                    $('#imagePreviewContainer').removeClass('d-none');
+                    // Show image preview if available
+                    if (post.image) {
+                        $('#imagePreview').attr('src', '<?= base_url("uploads/posts") ?>/' + post.image);
+                        $('#imagePreviewContainer').removeClass('d-none');
+                    } else {
+                        $('#imagePreviewContainer').addClass('d-none');
+                    }
                     
                     // Image not required when editing
                     $('#image').removeAttr('required');
                     
-                    // Show modal
+                    // Show modal with animation
                     $('#postModal').modal('show');
+                    
+                    // Add a slight entrance animation for form elements
+                    $('.modal-body .mb-3').each(function(index) {
+                        $(this).css({
+                            'opacity': '0',
+                            'transform': 'translateY(20px)'
+                        });
+                        
+                        setTimeout(() => {
+                            $(this).css({
+                                'transition': 'all 0.3s ease',
+                                'opacity': '1',
+                                'transform': 'translateY(0)'
+                            });
+                        }, 100 + (index * 50));
+                    });
                 } else {
-                    alert('Error: ' + response.message);
+                    // Show error toast
+                    $('body').append(
+                        '<div class="position-fixed top-0 end-0 p-3" style="z-index: 9999">' +
+                        '<div class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">' +
+                        '<div class="d-flex">' +
+                        '<div class="toast-body">Error: ' + response.message + '</div>' +
+                        '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>'
+                    );
+                    
+                    // Show toast with Bootstrap 5
+                    if (typeof bootstrap !== 'undefined') {
+                        const toastEl = document.querySelector('.toast');
+                        const toast = new bootstrap.Toast(toastEl, { delay: 5000 });
+                        toast.show();
+                    } else {
+                        // Fallback for Bootstrap 4
+                        $('.toast').toast({ delay: 5000 }).toast('show');
+                    }
                 }
             },
             error: function(xhr) {
-                alert('An error occurred. Status: ' + xhr.status);
+                // Remove loading animation
+                postItem.find('.position-absolute').remove();
+                postItem.css({
+                    'position': '',
+                    'overflow': ''
+                });
+                
+                // Show error toast
+                $('body').append(
+                    '<div class="position-fixed top-0 end-0 p-3" style="z-index: 9999">' +
+                    '<div class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">' +
+                    '<div class="d-flex">' +
+                    '<div class="toast-body">An error occurred. Status: ' + xhr.status + '</div>' +
+                    '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>'
+                );
+                
+                // Show toast with Bootstrap 5
+                if (typeof bootstrap !== 'undefined') {
+                    const toastEl = document.querySelector('.toast');
+                    const toast = new bootstrap.Toast(toastEl, { delay: 5000 });
+                    toast.show();
+                } else {
+                    // Fallback for Bootstrap 4
+                    $('.toast').toast({ delay: 5000 }).toast('show');
+                }
             }
         });
     });
     
-    // Delete post (show confirmation)
+    // Delete post with enhanced confirmation
     $(document).on('click', '.delete-post', function() {
         const postId = $(this).data('id');
         $('#confirmDelete').data('id', postId);
+        
+        // Find the post title for confirmation message
+        const postTitle = $(this).closest('.post-item').find('.post-title a').text().trim();
+        if (postTitle) {
+            $('#deleteModal .modal-body p:first').text('Are you sure you want to delete "' + postTitle + '"?');
+        }
+        
+        // Show modal with subtle entrance animation
         $('#deleteModal').modal('show');
+        $('#deleteModal .bi-exclamation-triangle').css({
+            'transform': 'scale(0.5)',
+            'opacity': '0'
+        });
+        
+        setTimeout(() => {
+            $('#deleteModal .bi-exclamation-triangle').css({
+                'transition': 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                'transform': 'scale(1)',
+                'opacity': '1'
+            });
+        }, 100);
     });
     
-    // Confirm delete
+    // Confirm delete with animations
     $('#confirmDelete').click(function() {
         const postId = $(this).data('id');
+        const $button = $(this);
+        
+        // Show loading state
+        $button.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...');
         
         $.ajax({
             url: '<?= site_url("PostsController/delete") ?>/' + postId,
@@ -867,16 +732,96 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(response) {
                 if (response.success) {
-                    $('#deleteModal').modal('hide');
-                    location.reload();
+                    // Show success animation in modal
+                    $('#deleteModal .modal-body').html(
+                        '<div class="text-center">' +
+                        '<i class="bi bi-check-circle text-success" style="font-size: 48px; animation: scaleIn 0.5s;"></i>' +
+                        '<p class="mt-3">Post deleted successfully!</p>' +
+                        '</div>'
+                    );
+                    
+                    // Find the post item to animate it out
+                    const postItem = $('.post-item[data-post-id="' + postId + '"]');
+                    postItem.css({
+                        'transition': 'all 0.5s ease',
+                        'transform': 'translateX(100px)',
+                        'opacity': '0',
+                        'height': postItem.height() + 'px'
+                    });
+                    
+                    // After animation, close modal and refresh page
+                    setTimeout(function() {
+                        $('#deleteModal').modal('hide');
+                        postItem.css({
+                            'height': '0',
+                            'padding': '0',
+                            'margin': '0',
+                            'overflow': 'hidden'
+                        });
+                        
+                        setTimeout(function() {
+                            postItem.remove();
+                            
+                            // If no posts left, show empty state
+                            if ($('.post-item').length === 0) {
+                                $('.posts-container').html(
+                                    '<div class="empty-state">' +
+                                    '<i class="bi bi-file-earmark-text"></i>' +
+                                    '<p>No posts yet. Create your first post!</p>' +
+                                    '</div>'
+                                );
+                            }
+                        }, 300);
+                    }, 1200);
                 } else {
-                    alert('Error: ' + response.message);
+                    // Reset button state
+                    $button.prop('disabled', false).text('Delete');
+                    
+                    // Show error in modal
+                    $('#deleteModal .modal-body').html(
+                        '<div class="text-center mb-3">' +
+                        '<i class="bi bi-x-circle text-danger" style="font-size: 48px;"></i>' +
+                        '</div>' +
+                        '<p class="text-center">Error: ' + response.message + '</p>' +
+                        '<p class="text-center text-muted small">Please try again.</p>'
+                    );
                 }
             },
             error: function(xhr) {
-                alert('An error occurred. Status: ' + xhr.status);
+                // Reset button state
+                $button.prop('disabled', false).text('Delete');
+                
+                // Show error in modal
+                $('#deleteModal .modal-body').html(
+                    '<div class="text-center mb-3">' +
+                    '<i class="bi bi-x-circle text-danger" style="font-size: 48px;"></i>' +
+                    '</div>' +
+                    '<p class="text-center">An error occurred. Status: ' + xhr.status + '</p>' +
+                    '<p class="text-center text-muted small">Please try again.</p>'
+                );
             }
         });
     });
+    
+    // Add animations for keyframe definitions
+    $('<style>')
+        .prop('type', 'text/css')
+        .html(`
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+            @keyframes scaleIn {
+                0% { transform: scale(0); opacity: 0; }
+                50% { transform: scale(1.2); opacity: 1; }
+                100% { transform: scale(1); opacity: 1; }
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+        `)
+        .appendTo('head');
 });
 </script>
