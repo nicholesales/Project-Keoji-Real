@@ -89,3 +89,10 @@ $route['user/update-profile'] = 'UserController/updateProfile';
 $route['default_controller'] = 'welcome';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
+
+// Comments routes
+$route['comments/my'] = 'CommentController/my_comments';
+$route['comments/received'] = 'CommentController/received_comments';
+$route['comments/delete/(:num)'] = 'CommentController/delete/$1';
+$route['comments/edit/(:num)'] = 'CommentController/edit/$1';
+$route['comments/update'] = 'CommentController/update';

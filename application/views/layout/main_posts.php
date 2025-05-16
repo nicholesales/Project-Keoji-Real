@@ -63,20 +63,19 @@ body.dark-mode-preload,
             </div>
 
             <?php if ($this->session->userdata('isLoggedIn')): ?>
-                <div class="user-profile">
-                    <div class="user-avatar">
-                        <?php if ($this->session->userdata('profile_photo')): ?>
-                            <img src="<?= base_url('uploads/profiles/' . $this->session->userdata('profile_photo')) ?>" alt="Profile">
-                        <?php else: ?>
-                            <?= strtoupper(substr($this->session->userdata('username'), 0, 1)) ?>
-                        <?php endif; ?>
-                    </div>
-                    <div class="user-info">
-                        <p class="username">
-                            <?= htmlspecialchars($this->session->userdata('username'), ENT_QUOTES, 'UTF-8') ?></p>
-                        <p class="role"><?= $post_count ?? $this->session->userdata('post_count') ?? 0 ?> Posts</p>
-                    </div>
-                </div>
+  <div class="user-profile">
+    <div class="user-avatar">
+        <?php if (!empty($this->session->userdata('profile_photo'))): ?>
+            <img src="<?= base_url('uploads/profiles/' . $this->session->userdata('profile_photo')) ?>" alt="<?= $this->session->userdata('username') ?>">
+        <?php else: ?>
+            <i class="bi bi-person-fill"></i>
+        <?php endif; ?>
+    </div>
+    <div class="user-info">
+        <p class="username"><?= $this->session->userdata('username') ?></p>
+        <p class="role"><?= $this->session->userdata('is_admin') ? 'Admin' : 'User' ?></p>
+    </div>
+</div>
             <?php endif; ?>
 
             <ul class="list-unstyled components">
@@ -97,15 +96,32 @@ body.dark-mode-preload,
                 </li>
                 <?php if ($this->session->userdata('isLoggedIn')): ?>
                     <li>
-                        <a href="#commentSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
-                            <i class="bi bi-chat-left-text sidebar-icon"></i><span>Comments</span>
+                        <a href="#commentsSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                            <i class="bi bi-chat-dots sidebar-icon"></i> Comments
+                            <?php 
+                            $total_comments = (isset($user_data['my_comment_count']) ? $user_data['my_comment_count'] : 0) + 
+                                            (isset($user_data['received_comment_count']) ? $user_data['received_comment_count'] : 0);
+                            if ($total_comments > 0): 
+                            ?>
+                                <span class="nav-count"><?= $total_comments ?></span>
+                            <?php endif; ?>
                         </a>
-                        <ul class="collapse list-unstyled" id="commentSubmenu">
-                            <li>
-                                <a href="<?= site_url('comments/my-comments') ?>"><span>My Comments</span></a>
+                        <ul class="collapse <?= $this->uri->segment(1) == 'comments' ? 'show' : '' ?>" id="commentsSubmenu">
+                            <li class="<?= $this->uri->segment(1) == 'comments' && $this->uri->segment(2) == 'my' ? 'active' : '' ?>">
+                                <a href="<?= site_url('comments/my') ?>">
+                                    My Comments
+                                    <?php if (isset($user_data['my_comment_count']) && $user_data['my_comment_count'] > 0): ?>
+                                        <span class="nav-count"><?= $user_data['my_comment_count'] ?></span>
+                                    <?php endif; ?>
+                                </a>
                             </li>
-                            <li>
-                                <a href="<?= site_url('comments/received') ?>"><span>Received Comments</span></a>
+                            <li class="<?= $this->uri->segment(1) == 'comments' && $this->uri->segment(2) == 'received' ? 'active' : '' ?>">
+                                <a href="<?= site_url('comments/received') ?>">
+                                    Received Comments
+                                    <?php if (isset($user_data['received_comment_count']) && $user_data['received_comment_count'] > 0): ?>
+                                        <span class="nav-count"><?= $user_data['received_comment_count'] ?></span>
+                                    <?php endif; ?>
+                                </a>
                             </li>
                         </ul>
                     </li>

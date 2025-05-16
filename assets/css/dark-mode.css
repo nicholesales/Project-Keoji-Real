@@ -563,3 +563,118 @@ body.dark-mode .blog-feed-item .feed-title {
 }
 
 /* Transition all properties for smooth dark mode toggle */
+
+
+/* Dark Mode for Comment Pages */
+html.dark-mode .blog-posts-section {
+    color: #e4e6eb;
+}
+
+html.dark-mode .section-header h2 {
+    color: #e4e6eb;
+}
+
+html.dark-mode .comments-container > p {
+    color: #b0b3b8;
+}
+
+/* Comment items */
+html.dark-mode .user-comment-item,
+html.dark-mode .received-comment-item {
+    background-color: #242526;
+    border: 1px solid #3a3b3c;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+html.dark-mode .user-comment-item:hover,
+html.dark-mode .received-comment-item:hover {
+    background-color: #2d2d2e;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Post titles and links */
+html.dark-mode .comment-post-info {
+    border-bottom-color: #3a3b3c;
+}
+
+html.dark-mode .comment-post-info .post-title a {
+    color: #e4e6eb;
+}
+
+html.dark-mode .comment-post-info .post-title a:hover {
+    color: #dc2626;
+}
+
+html.dark-mode .comment-post-info .post-author {
+    color: #b0b3b8;
+}
+
+/* Comment content */
+html.dark-mode .comment-content {
+    color: #e4e6eb;
+}
+
+/* Comment meta */
+html.dark-mode .comment-meta {
+    border-top-color: #3a3b3c;
+    color: #b0b3b8;
+}
+
+html.dark-mode .comment-date {
+    color: #b0b3b8;
+}
+
+/* Action buttons */
+html.dark-mode .action-btn {
+    color: #b0b3b8;
+}
+
+html.dark-mode .action-btn.delete:hover {
+    color: #dc2626;
+    background-color: rgba(220, 38, 38, 0.1);
+}
+
+html.dark-mode .action-btn.edit:hover {
+    color: #3b82f6;
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* Empty state */
+html.dark-mode .empty-state {
+    color: #b0b3b8;
+    background-color: #242526;
+    border-color: #3a3b3c;
+}
+
+html.dark-mode .empty-state i {
+    color: #3a3b3c;
+}
+
+/* View post hint */
+html.dark-mode .view-post-hint {
+    color: #dc2626;
+}
+
+/* For view links */
+html.dark-mode a.comment-link {
+    color: #e4e6eb;
+}
+
+html.dark-mode .comment-user-info .comment-username {
+    color: #e4e6eb;
+}
+
+/* Updated animation for dark mode */
+html.dark-mode .comment-updated {
+    animation: darkModeHighlight 1.5s ease;
+}
+
+@keyframes darkModeHighlight {
+    0% { background-color: #1e3a5f; }
+    100% { background-color: #242526; }
+}
+
+/* Date styling */
+html.dark-mode .calendar-icon {
+    color: #b0b3b8;
+}
