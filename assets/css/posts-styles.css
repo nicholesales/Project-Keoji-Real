@@ -26,6 +26,26 @@
         #sidebar.active {
             margin-left: -250px;
         }
+        textarea#content {
+    text-align: left !important; /* Force left alignment */
+}
+
+/* Also target the placeholder specifically for better browser compatibility */
+textarea#content::placeholder {
+    text-align: left !important;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    opacity: 0.6;
+}
+
+/* Make sure your textarea has adequate height */
+textarea#content {
+    min-height: 150px;
+    resize: vertical;
+    padding: 10px;
+}
+        
 
         #sidebar .sidebar-header {
             padding: 20px;
