@@ -77,3 +77,6 @@ $route['user/update-profile'] = 'UserController/updateProfile';
 $route['default_controller'] = 'welcome';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
+
+$route['posts/get_drafts'] = 'PostsController/get_drafts';
+$route['posts/get_published'] = 'PostsController/get_published';

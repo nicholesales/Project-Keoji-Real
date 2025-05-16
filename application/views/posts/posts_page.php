@@ -827,3 +827,109 @@ $(document).ready(function() {
         .appendTo('head');
 });
 </script>
+
+<script>
+$(document).ready(function() {
+    // Tab switching functionality with AJAX
+    $('.tab-link').click(function(e) {
+        e.preventDefault();
+        
+        // Update active tab
+        $('.tab-link').removeClass('active');
+        $(this).addClass('active');
+        
+        // Get the filter from the tab
+        const filter = $(this).text().toLowerCase().trim();
+        console.log('Selected filter:', filter);
+        
+        // Show loading state
+        $('.posts-container').html('<div class="text-center py-4"><div class="spinner-border text-secondary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
+        
+        // Handle different tab filters
+        if (filter === 'drafts') {
+            console.log('Loading drafts...');
+            // Load drafts
+            $.ajax({
+                url: '<?= site_url("posts/get_drafts") ?>',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    console.log('Drafts response:', response);
+                    if (response && response.success) {
+                        // Update content
+                        $('.posts-container').html(response.html);
+                        // Update page title
+                        $('.section-header h2').text('Draft Posts');
+                    } else {
+                        console.error('Error in response:', response);
+                        $('.posts-container').html('<div class="alert alert-danger">Error: ' + (response?.message || 'Unknown error') + '</div>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX error:', {xhr: xhr, status: status, error: error});
+                    console.error('Response text:', xhr.responseText);
+                    
+                    // Attempt to parse response if it's JSON
+                    let errorMsg = 'Error loading content. Please try again.';
+                    try {
+                        const jsonResponse = JSON.parse(xhr.responseText);
+                        if (jsonResponse && jsonResponse.message) {
+                            errorMsg = jsonResponse.message;
+                        }
+                    } catch (e) {
+                        // If response isn't JSON, use status text or error
+                        errorMsg = xhr.statusText || error || errorMsg;
+                    }
+                    
+                    $('.posts-container').html('<div class="alert alert-danger">' + errorMsg + '</div>');
+                }
+            });
+        } else if (filter === 'published') {
+            console.log('Loading published posts...');
+            // Load published posts
+            $.ajax({
+                url: '<?= site_url("posts/get_published") ?>',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    console.log('Published response:', response);
+                    if (response && response.success) {
+                        // Update content
+                        $('.posts-container').html(response.html);
+                        // Update page title
+                        $('.section-header h2').text('Published Posts');
+                    } else {
+                        console.error('Error in response:', response);
+                        $('.posts-container').html('<div class="alert alert-danger">Error: ' + (response?.message || 'Unknown error') + '</div>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX error:', {xhr: xhr, status: status, error: error});
+                    console.error('Response text:', xhr.responseText);
+                    
+                    // Attempt to parse response if it's JSON
+                    let errorMsg = 'Error loading content. Please try again.';
+                    try {
+                        const jsonResponse = JSON.parse(xhr.responseText);
+                        if (jsonResponse && jsonResponse.message) {
+                            errorMsg = jsonResponse.message;
+                        }
+                    } catch (e) {
+                        // If response isn't JSON, use status text or error
+                        errorMsg = xhr.statusText || error || errorMsg;
+                    }
+                    
+                    $('.posts-container').html('<div class="alert alert-danger">' + errorMsg + '</div>');
+                }
+            });
+        } else {
+            console.log('Loading all posts...');
+            // All posts - reload the page to show default view
+            location.reload();
+        }
+    });
+    
+    // Removed event handlers for publish-draft and publishAllBtn
+    // Since these buttons have been removed from the UI
+});
+</script>

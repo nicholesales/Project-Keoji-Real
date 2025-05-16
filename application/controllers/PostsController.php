@@ -349,4 +349,153 @@ class PostsController extends MY_Controller
             'success' => true, 
             'message' => 'Post deleted successfully'
         ]);
-    }}
+    }
+    public function get_drafts()
+{
+    // Debug information
+    log_message('debug', '==== get_drafts() called ====');
+    log_message('debug', 'Is AJAX request: ' . ($this->input->is_ajax_request() ? 'Yes' : 'No'));
+    log_message('debug', 'User logged in: ' . ($this->session->userdata('isLoggedIn') ? 'Yes' : 'No'));
+    
+    // Check if request is AJAX
+    if (!$this->input->is_ajax_request()) {
+        log_message('error', 'Direct access attempted to get_drafts()');
+        show_error('Direct access not allowed.');
+        return;
+    }
+    
+    // Check if user is logged in
+    if (!$this->session->userdata('isLoggedIn')) {
+        log_message('error', 'Non-logged in user attempted to get_drafts()');
+        echo json_encode(['success' => false, 'message' => 'User not logged in']);
+        return;
+    }
+    
+    try {
+        // Get user ID from session
+        $user_id = $this->session->userdata('user_id');
+        log_message('debug', 'User ID: ' . $user_id);
+        
+        // Get draft posts for this user
+        $this->db->where('user_id', $user_id);
+        $this->db->where('status', 'draft');
+        $this->db->order_by('date_created', 'DESC');
+        
+        // Debug database query
+        $query = $this->db->get_compiled_select('posts_table');
+        log_message('debug', 'SQL Query: ' . $query);
+        
+        // Get drafts posts
+        $drafts = $this->post_model->get_all();
+        log_message('debug', 'Number of drafts found: ' . count($drafts));
+        
+        // Prepare the HTML for drafts - MODIFIED to remove Publish All button and checkmark icons
+        $html = '';
+        
+        if (empty($drafts)) {
+            $html .= '<div class="empty-state">';
+            $html .= '<i class="bi bi-file-earmark-text"></i>';
+            $html .= '<p>No draft posts yet. Save a post as draft to see it here!</p>';
+            $html .= '</div>';
+        } else {
+            // Removed the "Publish All" button section
+            
+            foreach ($drafts as $draft) {
+                $html .= '<div class="draft-item" data-post-id="' . $draft['post_id'] . '">';
+                $html .= '<div class="draft-icon">';
+                $html .= '<i class="bi bi-file-earmark"></i>';
+                $html .= '</div>';
+                $html .= '<div class="draft-content">';
+                $html .= '<div class="draft-title">';
+                $html .= '<span class="draft-title-text">' . htmlspecialchars($draft['title'], ENT_QUOTES, 'UTF-8') . '</span>';
+                $html .= '</div>';
+                $html .= '<div class="draft-meta">';
+                $html .= '<span><i class="bi bi-tag"></i> ' . htmlspecialchars($draft['category'], ENT_QUOTES, 'UTF-8') . '</span>';
+                $html .= '<span><i class="bi bi-calendar3"></i> Last edited: ' . date('M d, Y', strtotime($draft['updated_at'] ?? $draft['date_created'])) . '</span>';
+                $html .= '</div>';
+                $html .= '</div>';
+                $html .= '<div class="draft-actions">';
+                // Removed the publish button
+                $html .= '<button class="action-btn edit-post" data-id="' . $draft['post_id'] . '" title="Edit">';
+                $html .= '<i class="bi bi-pencil"></i>';
+                $html .= '</button>';
+                $html .= '<button class="action-btn delete delete-post" data-id="' . $draft['post_id'] . '" title="Delete">';
+                $html .= '<i class="bi bi-trash"></i>';
+                $html .= '</button>';
+                $html .= '</div>';
+                $html .= '</div>';
+            }
+        }
+        
+        log_message('debug', 'HTML generated successfully');
+        echo json_encode(['success' => true, 'html' => $html]);
+        
+    } catch (Exception $e) {
+        log_message('error', 'Exception in get_drafts(): ' . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
+    }
+}
+public function get_published()
+{
+    // Check if request is AJAX
+    if (!$this->input->is_ajax_request()) {
+        show_error('Direct access not allowed.');
+        return;
+    }
+    
+    // Check if user is logged in
+    if (!$this->session->userdata('isLoggedIn')) {
+        echo json_encode(['success' => false, 'message' => 'User not logged in']);
+        return;
+    }
+    
+    // Get user ID from session
+    $user_id = $this->session->userdata('user_id');
+    
+    // Get published posts for this user
+    $this->db->where('user_id', $user_id);
+    $this->db->where('status', 'published');
+    $this->db->order_by('date_created', 'DESC');
+    $published = $this->post_model->get_all();
+    
+    // Prepare the HTML for published posts
+    $html = '';
+    
+    if (empty($published)) {
+        $html .= '<div class="empty-state">';
+        $html .= '<i class="bi bi-file-earmark-text"></i>';
+        $html .= '<p>No published posts yet. Publish a post to see it here!</p>';
+        $html .= '</div>';
+    } else {
+        foreach ($published as $post) {
+            $html .= '<div class="post-item" data-post-id="' . $post['post_id'] . '">';
+            $html .= '<div class="post-icon">';
+            $html .= '<i class="bi bi-file-earmark-text"></i>';
+            $html .= '</div>';
+            $html .= '<div class="post-content">';
+            $html .= '<div class="post-title">';
+            $html .= '<a href="' . site_url('posts/view/' . $post['post_id']) . '">';
+            $html .= htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8');
+            $html .= '</a>';
+            $html .= '</div>';
+            $html .= '<div class="post-meta">';
+            $html .= '<span class="status-badge published">Published</span>';
+            $html .= '<span><i class="bi bi-calendar3"></i> ' . date('M d, Y', strtotime($post['date_created'])) . '</span>';
+            $html .= '</div>';
+            $html .= '</div>';
+            $html .= '<div class="post-actions">';
+            $html .= '<button class="action-btn edit-post" data-id="' . $post['post_id'] . '" title="Edit">';
+            $html .= '<i class="bi bi-pencil"></i>';
+            $html .= '</button>';
+            $html .= '<button class="action-btn delete delete-post" data-id="' . $post['post_id'] . '" title="Delete">';
+            $html .= '<i class="bi bi-trash"></i>';
+            $html .= '</button>';
+            $html .= '</div>';
+            $html .= '</div>';
+        }
+    }
+    
+    echo json_encode(['success' => true, 'html' => $html]);
+}
+
+}
