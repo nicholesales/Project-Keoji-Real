@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="<?= base_url('assets/css/posts_page.css'); ?>">
+
 <?php 
 // Debug data
 echo '<!-- Debug: recentPosts count: ' . (isset($recentPosts) ? count($recentPosts) : 'not set') . ' -->';
@@ -169,6 +171,7 @@ echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featu
                     <div class="mb-3">
                         <label for="content" class="form-label">Content</label>
                         <textarea class="form-control" id="content" name="content" rows="3" placeholder="Write your post content here" required></textarea>
+                        <textarea class="form-control" id="content" name="content" rows="3" placeholder="Input text" required></textarea>
                     </div>
                     
                     <div class="mb-3">
