@@ -36,6 +36,9 @@
                         </div>
                         
                         <div class="comment-actions">
+                            <button class="action-btn edit edit-comment" data-id="<?= $comment['comment_id'] ?>" title="Edit Comment">
+                                <i class="bi bi-pencil"></i>
+                            </button>
                             <button class="action-btn delete delete-comment" data-id="<?= $comment['comment_id'] ?>" title="Delete Comment">
                                 <i class="bi bi-trash"></i>
                             </button>
@@ -47,15 +50,42 @@
     </div>
 </div>
 
+<!-- Modal for editing comments -->
+<div class="comment-edit-modal" id="commentEditModal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5>Edit Comment</h5>
+            <button type="button" class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <textarea id="editCommentText" class="form-control" rows="4"></textarea>
+            <input type="hidden" id="editCommentId">
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-cancel">Cancel</button>
+            <button type="button" class="btn-save">Save Changes</button>
+        </div>
+    </div>
+</div>
+
 <script>
 $(document).ready(function() {
-    // Add hover effects to delete button
+    // Add hover effects to action buttons
     $('.delete-comment').hover(
         function() {
             $(this).find('i').removeClass('bi-trash').addClass('bi-trash-fill');
         },
         function() {
             $(this).find('i').removeClass('bi-trash-fill').addClass('bi-trash');
+        }
+    );
+    
+    $('.edit-comment').hover(
+        function() {
+            $(this).find('i').removeClass('bi-pencil').addClass('bi-pencil-fill');
+        },
+        function() {
+            $(this).find('i').removeClass('bi-pencil-fill').addClass('bi-pencil');
         }
     );
     
@@ -105,6 +135,86 @@ $(document).ready(function() {
                     alert('An error occurred: ' + error);
                 }
             });
+        }
+    });
+    
+    // Edit Comment - Open Modal
+    $('.edit-comment').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        var commentId = $(this).data('id');
+        var commentElement = $(this).closest('.user-comment-item');
+        var commentText = commentElement.find('.comment-content').text().trim();
+        
+        // Set values in the modal
+        $('#editCommentId').val(commentId);
+        $('#editCommentText').val(commentText);
+        
+        // Show modal with flex display
+        $('#commentEditModal').css('display', 'flex');
+        $('#editCommentText').focus();
+    });
+    
+    // Close modal
+    $('.close-modal, .btn-cancel').on('click', function() {
+        $('#commentEditModal').fadeOut(200);
+    });
+    
+    // Save edited comment
+    $('.btn-save').on('click', function() {
+        var commentId = $('#editCommentId').val();
+        var commentText = $('#editCommentText').val();
+        var commentElement = $('.user-comment-item[data-comment-id="' + commentId + '"]');
+        
+        if (commentText.trim() === '') {
+            alert('Comment cannot be empty');
+            return;
+        }
+        
+        $.ajax({
+            url: '<?= site_url('comments/update') ?>',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                comment_id: commentId,
+                comment_text: commentText
+            },
+            success: function(response) {
+                if (response.success) {
+                    // Update the comment text in the DOM
+                    commentElement.find('.comment-content').html(nl2br(response.comment_text));
+                    
+                    // Close the modal
+                    $('#commentEditModal').fadeOut(200);
+                    
+                    // Show success message or visual feedback
+                    commentElement.addClass('comment-updated');
+                    setTimeout(function() {
+                        commentElement.removeClass('comment-updated');
+                    }, 2000);
+                } else {
+                    alert(response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log('Error:', error);
+                console.log('Status:', status);
+                console.log('Response:', xhr.responseText);
+                alert('An error occurred: ' + error);
+            }
+        });
+    });
+    
+    // Helper function to convert newlines to <br> tags
+    function nl2br(str) {
+        return str.replace(/\n/g, '<br>');
+    }
+    
+    // Allow ESC key to close modal
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape' && $('#commentEditModal').is(':visible')) {
+            $('#commentEditModal').fadeOut(200);
         }
     });
 });

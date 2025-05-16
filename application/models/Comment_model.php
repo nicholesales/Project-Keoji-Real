@@ -100,6 +100,38 @@ class Comment_model extends CI_Model
         return $this->db->count_all_results($this->table);
     }
     
+    /**
+     * Count comments by user ID
+     * 
+     * @param int $user_id User ID to count comments for
+     * @return int Number of comments by user
+     */
+    public function count_comments($user_id = null)
+    {
+        if ($user_id !== null) {
+            $this->db->where('user_id', $user_id);
+        }
+        return $this->db->count_all_results($this->table);
+    }
+
+    /**
+     * Count comments received on user's posts
+     * 
+     * @param int $user_id User ID to count received comments for
+     * @return int Number of comments received
+     */
+    public function count_received_comments($user_id = null)
+    {
+        if ($user_id !== null) {
+            $this->db->select('comments_table.*');
+            $this->db->from($this->table);
+            $this->db->join('posts_table', 'posts_table.post_id = comments_table.post_id');
+            $this->db->where('posts_table.user_id', $user_id);
+            return $this->db->count_all_results();
+        }
+        return 0;
+    }
+    
     // Validation
     private function _validate($data)
     {
