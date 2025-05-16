@@ -447,3 +447,83 @@ $(document).ready(function() {
     $(window).on('scroll', revealOnScroll);
 });
 </script>
+<!-- Add this at the bottom of your feed_page.php file, just before the closing </div> or </body> tag -->
+<script>
+$(document).ready(function() {
+    // Function to apply dark mode specifically to sidebar elements
+    function applySidebarDarkMode() {
+        if ($('body').hasClass('dark-mode')) {
+            // Sidebar titles
+            $('.sidebar-title, .trending-section h3, .categories-section h3, .activity-section h3').css('color', '#e4e6eb');
+            
+            // Trending posts titles and numbers
+            $('.trending-title').css('color', '#e4e6eb');
+            $('.trending-number').css('color', '#dc2626');
+            
+            // Category tags
+            $('.category-tag').css({
+                'background-color': '#333333',
+                'color': '#e4e6eb'
+            });
+            
+            // Activity content and time
+            $('.activity-content div').css('color', '#e4e6eb');
+            $('.activity-time').css('color', '#b0b3b8');
+            
+            // Recent Activity title
+            $('.feed-sidebar h3').css('color', '#e4e6eb');
+            
+            // Categories title
+            $('.categories-section h3').css('color', '#e4e6eb');
+            
+            // Feed sidebar background
+            $('.feed-sidebar').css({
+                'background-color': '#1e1e1e',
+                'border-color': '#2c2c2c'
+            });
+        } else {
+            // Reset to light mode colors
+            $('.sidebar-title, .trending-section h3, .categories-section h3, .activity-section h3').css('color', '');
+            $('.trending-title').css('color', '');
+            $('.trending-number').css('color', '');
+            $('.category-tag').css({
+                'background-color': '',
+                'color': ''
+            });
+            $('.activity-content div').css('color', '');
+            $('.activity-time').css('color', '');
+            $('.feed-sidebar h3').css('color', '');
+            $('.categories-section h3').css('color', '');
+            $('.feed-sidebar').css({
+                'background-color': '',
+                'border-color': ''
+            });
+        }
+    }
+    
+    // Apply immediately on page load
+    applySidebarDarkMode();
+    
+    // Listen for dark mode toggle events
+    $(document).on('themeChanged', function() {
+        applySidebarDarkMode();
+    });
+    
+    // Also watch for body class changes
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.attributeName === 'class') {
+                applySidebarDarkMode();
+            }
+        });
+    });
+    
+    observer.observe(document.body, { attributes: true });
+    
+    // Add click listener to the theme toggle button to ensure our function runs
+    $('.theme-toggle-btn, button[aria-label="Theme Toggle"], button[aria-label="Toggle dark mode"]').on('click', function() {
+        // Wait a small amount of time for the dark-mode class to be applied
+        setTimeout(applySidebarDarkMode, 50);
+    });
+});
+</script>

@@ -1,0 +1,565 @@
+/* dark-mode.css - Save this as a separate CSS file in your assets/css directory */
+
+/* Dark Mode Variables */
+:root {
+    --dark-bg: #121212;
+    --dark-card-bg: #1e1e1e;
+    --dark-text: #e4e6eb;
+    --dark-text-secondary: #b0b3b8;
+    --dark-border: #2c2c2c;
+    --dark-hover: #333333;
+    --dark-input-bg: #333333;
+    --dark-primary: #dc2626;
+    --dark-primary-hover: #b91c1c;
+    --dark-sidebar: #1e1e1e;
+}
+
+/* Dark Mode Classes */
+body.dark-mode {
+    background-color: var(--dark-bg);
+    color: var(--dark-text);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Sidebar Dark Mode */
+body.dark-mode #sidebar {
+    background: var(--dark-sidebar);
+    color: var(--dark-text);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode #sidebar .sidebar-header {
+    background: var(--dark-sidebar);
+    border-bottom: 1px solid var(--dark-border);
+}
+
+body.dark-mode #sidebar ul li a {
+    color: var(--dark-text);
+    border-bottom: 1px solid var(--dark-border);
+}
+
+body.dark-mode #sidebar ul li a:hover {
+    background-color: var(--dark-hover);
+}
+
+body.dark-mode #sidebar ul li.active>a {
+    background-color: var(--dark-hover);
+}
+
+body.dark-mode #sidebar ul ul a {
+    background: var(--dark-bg);
+}
+
+body.dark-mode #sidebar .sidebar-footer {
+    border-top: 1px solid var(--dark-border);
+}
+
+body.dark-mode .user-profile {
+    border-bottom: 1px solid var(--dark-border);
+}
+
+body.dark-mode .user-info .role {
+    color: var(--dark-text-secondary);
+}
+
+/* Navbar Dark Mode */
+body.dark-mode .navbar {
+    background-color: var(--dark-sidebar) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .3);
+    border-bottom: 1px solid var(--dark-border);
+}
+
+body.dark-mode .navbar-brand {
+    color: var(--dark-text) !important;
+}
+
+body.dark-mode #sidebarCollapse {
+    color: var(--dark-text);
+}
+
+body.dark-mode #sidebarCollapse:hover {
+    color: var(--dark-primary);
+}
+
+/* Blog Posts Section Dark Mode */
+body.dark-mode .blog-posts-section {
+    color: var(--dark-text);
+}
+
+body.dark-mode .tab-link {
+    color: var(--dark-text-secondary);
+}
+
+body.dark-mode .tab-link.active {
+    color: var(--dark-primary);
+    border-bottom-color: var(--dark-primary);
+}
+
+body.dark-mode .tab-link:hover {
+    color: var(--dark-text);
+}
+
+/* Posts Container Dark Mode */
+body.dark-mode .posts-container {
+    background: var(--dark-card-bg);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .post-item {
+    border-bottom: 1px solid var(--dark-border);
+}
+
+body.dark-mode .post-item:hover {
+    background-color: var(--dark-hover);
+}
+
+body.dark-mode .post-title span {
+    color: var(--dark-text);
+}
+
+body.dark-mode .post-meta {
+    color: var(--dark-text-secondary);
+}
+
+body.dark-mode .action-btn {
+    color: var(--dark-text-secondary);
+}
+
+body.dark-mode .action-btn:hover {
+    background-color: var(--dark-hover);
+}
+
+body.dark-mode .action-btn.delete:hover {
+    color: var(--dark-primary);
+}
+
+/* Featured Posts Carousel Dark Mode */
+body.dark-mode .featured-post-carousel {
+    background: var(--dark-card-bg);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .featured-post-details {
+    color: var(--dark-text);
+}
+
+body.dark-mode .featured-post-title {
+    color: var(--dark-text);
+}
+
+body.dark-mode .featured-post-title a {
+    color: var(--dark-text);
+}
+
+body.dark-mode .featured-post-snippet {
+    color: var(--dark-text-secondary);
+}
+
+body.dark-mode .featured-post-stats {
+    color: var(--dark-text-secondary);
+}
+
+body.dark-mode .carousel-control-prev-icon,
+body.dark-mode .carousel-control-next-icon {
+    filter: invert(1) grayscale(100);
+}
+
+body.dark-mode .carousel-indicators [data-bs-target] {
+    background-color: var(--dark-primary);
+}
+
+/* Empty State Dark Mode */
+body.dark-mode .empty-state {
+    color: var(--dark-text-secondary);
+}
+
+body.dark-mode .empty-state i {
+    color: var(--dark-border);
+}
+
+/* Modal Dark Mode */
+body.dark-mode .modal-content {
+    background-color: var(--dark-card-bg);
+    border-color: var(--dark-border);
+}
+
+body.dark-mode .modal-header {
+    border-bottom: 1px solid var(--dark-border);
+    background-color: var(--dark-sidebar);
+}
+
+body.dark-mode .modal-footer {
+    border-top: 1px solid var(--dark-border);
+    background-color: var(--dark-sidebar);
+}
+
+body.dark-mode .modal-title {
+    color: var(--dark-text);
+}
+
+body.dark-mode .btn-close {
+    filter: invert(1) grayscale(100) brightness(200%);
+}
+
+/* Form Elements Dark Mode */
+body.dark-mode .form-label {
+    color: var(--dark-text);
+}
+
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+    background-color: var(--dark-input-bg);
+    border-color: var(--dark-border);
+    color: var(--dark-text);
+}
+
+body.dark-mode .form-control:focus,
+body.dark-mode .form-select:focus {
+    border-color: var(--dark-primary);
+    background-color: var(--dark-input-bg);
+    color: var(--dark-text);
+}
+
+body.dark-mode .form-control::placeholder {
+    color: var(--dark-text-secondary);
+}
+
+body.dark-mode .form-check-label {
+    color: var(--dark-text);
+}
+
+body.dark-mode .form-check-input {
+    background-color: var(--dark-input-bg);
+    border-color: var(--dark-border);
+}
+
+body.dark-mode .form-check-input:checked {
+    background-color: var(--dark-primary);
+    border-color: var(--dark-primary);
+}
+
+body.dark-mode .custom-file-upload {
+    background-color: var(--dark-hover);
+    border-color: var(--dark-border);
+    color: var(--dark-text);
+}
+
+body.dark-mode .custom-file-upload:hover {
+    background-color: var(--dark-input-bg);
+    border-color: var(--dark-primary);
+}
+
+body.dark-mode .custom-file-upload i {
+    color: var(--dark-text-secondary);
+}
+
+body.dark-mode .text-muted {
+    color: var(--dark-text-secondary) !important;
+}
+
+/* Textarea Specific Dark Mode */
+body.dark-mode textarea#content {
+    background-color: var(--dark-input-bg);
+    border-color: var(--dark-border);
+    color: var(--dark-text);
+}
+
+body.dark-mode textarea#content::placeholder {
+    color: var(--dark-text-secondary);
+}
+
+/* Alert and Toast Dark Mode */
+body.dark-mode .alert-danger {
+    background-color: #350d0d;
+    color: #f8d7da;
+    border-color: #521313;
+}
+
+body.dark-mode .toast {
+    background-color: var(--dark-card-bg);
+    border: 1px solid var(--dark-border);
+}
+
+body.dark-mode .toast-body {
+    color: var(--dark-text);
+}
+
+/* Comments Section Dark Mode */
+body.dark-mode .comment-item {
+    background-color: var(--dark-hover);
+    border-left: 3px solid var(--dark-primary);
+}
+
+body.dark-mode .comment-item:hover {
+    background-color: #2a2a2a;
+}
+
+body.dark-mode .comment-username {
+    color: var(--dark-text);
+}
+
+body.dark-mode .comment-date {
+    color: var(--dark-text-secondary);
+}
+
+body.dark-mode .comment-content {
+    color: var(--dark-text);
+}
+
+/* Draft items in dark mode */
+body.dark-mode .draft-item {
+    border-bottom: 1px solid var(--dark-border);
+}
+
+body.dark-mode .draft-title-text {
+    color: var(--dark-text);
+}
+
+body.dark-mode .draft-meta {
+    color: var(--dark-text-secondary);
+}
+
+/* Fix for form check text when disabled */
+body.dark-mode .form-check.text-muted {
+    opacity: 0.7;
+}
+
+body.dark-mode #featured-helper-text {
+    color: var(--dark-text-secondary);
+}
+
+/* Fixed preview container */
+body.dark-mode #imagePreviewContainer {
+    background-color: var(--dark-card-bg);
+}
+
+/* CKEditor dark mode compatibility */
+body.dark-mode .ck.ck-editor__main>.ck-editor__editable {
+    background-color: var(--dark-input-bg) !important;
+    color: var(--dark-text) !important;
+}
+
+body.dark-mode .ck.ck-toolbar {
+    background-color: var(--dark-sidebar) !important;
+    border-color: var(--dark-border) !important;
+}
+
+body.dark-mode .ck.ck-button {
+    color: var(--dark-text) !important;
+}
+
+body.dark-mode .ck.ck-button:hover {
+    background-color: var(--dark-hover) !important;
+}
+
+/* Theme toggle icon styles */
+.theme-toggle-btn {
+    transition: transform 0.5s ease;
+}
+
+body.dark-mode .theme-toggle-btn .bi-moon-fill {
+    display: none;
+}
+
+body.dark-mode .theme-toggle-btn .bi-sun-fill {
+    display: inline-block;
+    color: #f1c40f;
+}
+
+.theme-toggle-btn .bi-sun-fill {
+    display: none;
+}
+
+/* Dropdown with dark mode */
+body.dark-mode .dropdown-menu {
+    background-color: var(--dark-card-bg);
+    border-color: var(--dark-border);
+}
+
+body.dark-mode .dropdown-item {
+    color: var(--dark-text);
+}
+
+body.dark-mode .dropdown-item:hover,
+body.dark-mode .dropdown-item:focus {
+    background-color: var(--dark-hover);
+    color: var(--dark-text);
+}
+
+body.dark-mode .dropdown-divider {
+    border-color: var(--dark-border);
+}
+
+/* Button styles in dark mode */
+body.dark-mode .btn-primary {
+    background-color: var(--dark-primary);
+    border-color: var(--dark-primary);
+}
+
+body.dark-mode .btn-primary:hover {
+    background-color: var(--dark-primary-hover);
+    border-color: var(--dark-primary-hover);
+}
+
+body.dark-mode .btn-outline-primary {
+    color: var(--dark-primary);
+    border-color: var(--dark-primary);
+}
+
+body.dark-mode .btn-outline-primary:hover {
+    background-color: var(--dark-primary);
+    color: white;
+}
+
+body.dark-mode .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+body.dark-mode .btn-danger:hover {
+    background-color: #bb2d3b;
+    border-color: #b02a37;
+}
+
+body.dark-mode .btn-outline-danger {
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+body.dark-mode .btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+body.dark-mode .btn-link {
+    color: var(--dark-text);
+}
+
+body.dark-mode .btn-link:hover {
+    color: var(--dark-primary);
+}
+
+/* Text colors in dark mode */
+body.dark-mode .text-dark {
+    color: var(--dark-text) !important;
+}
+
+/* Profile dropdown in dark mode */
+body.dark-mode .profile-image-dropdown {
+    border: 2px solid var(--dark-border);
+}
+
+/* Flash message alerts in dark mode */
+body.dark-mode .alert-success {
+    background-color: #0f3a28;
+    color: #d1e7dd;
+    border-color: #115740;
+}
+
+/* Feed Posts in Dark Mode */
+body.dark-mode .feed-post-item {
+    background-color: var(--dark-card-bg);
+    border-color: var(--dark-border);
+}
+
+body.dark-mode .feed-post-user {
+    color: var(--dark-text);
+}
+
+body.dark-mode .feed-post-header .user-info .username,
+body.dark-mode .feed-container .post-author {
+    color: var(--dark-text);
+}
+
+body.dark-mode .feed-container .post-date,
+body.dark-mode .feed-post-header .post-date {
+    color: var(--dark-text-secondary);
+}
+
+body.dark-mode .feed-container .blog-feed-section {
+    background-color: var(--dark-bg);
+}
+
+/* Blog Feed Item Styles */
+body.dark-mode .blog-feed-item {
+    background-color: var(--dark-card-bg);
+    border-color: var(--dark-border);
+}
+
+body.dark-mode .blog-feed-item .feed-title,
+body.dark-mode .blog-feed-item h2,
+body.dark-mode .blog-feed-item h3 {
+    color: var(--dark-text);
+}
+
+body.dark-mode .blog-feed-item .feed-content,
+body.dark-mode .blog-feed-item p {
+    color: var(--dark-text-secondary);
+}
+
+body.dark-mode .blog-feed-item .user-name,
+body.dark-mode .blog-feed-item .username,
+body.dark-mode .blog-feed-item .author-name {
+    color: var(--dark-text);
+}
+
+body.dark-mode .blog-feed-item .post-date,
+body.dark-mode .blog-feed-item .date {
+    color: var(--dark-text-secondary);
+}
+
+body.dark-mode .feed-post-category .category-badge,
+body.dark-mode .blog-feed-item .category,
+body.dark-mode .blog-feed-item .tag,
+body.dark-mode .blog-feed-item .category-tag {
+    background-color: var(--dark-hover);
+    color: var(--dark-text);
+}
+
+/* News tag and other categories/tags */
+body.dark-mode .tag,
+body.dark-mode .category-tag,
+body.dark-mode .badge {
+    background-color: var(--dark-hover);
+    color: var(--dark-text);
+}
+
+/* Comment counts and like counts */
+body.dark-mode .action-buttons .action-btn,
+body.dark-mode .post-stats .stat-item,
+body.dark-mode .feed-post-actions .action-btn {
+    color: var(--dark-text-secondary);
+}
+
+/* Specific selector for blog items */
+body.dark-mode .blog-feed-section .feed-item,
+body.dark-mode .blog-posts-section .feed-item {
+    background-color: var(--dark-card-bg);
+    border-color: var(--dark-border);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* User profile picture border */
+body.dark-mode .user-avatar,
+body.dark-mode .profile-pic,
+body.dark-mode .avatar {
+    border-color: var(--dark-border);
+}
+
+/* Generic blog post content */
+body.dark-mode .post-content,
+body.dark-mode .post-body,
+body.dark-mode .post-description,
+body.dark-mode .post-text {
+    color: var(--dark-text);
+}
+body.dark-mode .testcontent2,
+body.dark-mode h1.post-title,
+body.dark-mode .feed-post-title,
+body.dark-mode .post-title,
+body.dark-mode .blog-feed-item h2,
+body.dark-mode .blog-feed-item .feed-title {
+    color: #e4e6eb !important; /* Light color for dark mode */
+}
+
+/* Transition all properties for smooth dark mode toggle */

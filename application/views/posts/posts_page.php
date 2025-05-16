@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="<?= base_url('assets/css/posts_page.css'); ?>">
-
 <?php 
 // Debug data
 echo '<!-- Debug: recentPosts count: ' . (isset($recentPosts) ? count($recentPosts) : 'not set') . ' -->';
