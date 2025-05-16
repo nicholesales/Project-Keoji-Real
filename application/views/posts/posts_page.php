@@ -2,6 +2,19 @@
 // Debug data
 echo '<!-- Debug: recentPosts count: ' . (isset($recentPosts) ? count($recentPosts) : 'not set') . ' -->';
 echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featuredPosts) : 'not set') . ' -->';
+
+// First, add this code at the beginning of your PHP file, before the view is rendered
+// Load the required models if not already loaded
+$this->load->model('Like_model');
+$this->load->model('Comment_model');
+
+// Function to get post stats
+function get_post_stats($post_id) {
+    $CI = &get_instance();
+    return [
+        'likes' => $CI->Like_model->count_likes($post_id),
+        'comments' => $CI->Comment_model->count_comments($post_id)
+    ];}
 ?>
 
 <div class="blog-posts-section">
@@ -88,7 +101,7 @@ echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featu
             <div class="carousel-inner">
                 <?php foreach($featuredPosts as $index => $post): ?>
                   <div class="carousel-item <?= $index === 0 ? 'active' : '' ?>" data-post-id="<?= $post['post_id'] ?>">
-    <div class="featured-post-item" data-post-id="<?= $post['post_id'] ?>">
+                    <div class="featured-post-item" data-post-id="<?= $post['post_id'] ?>">
                             <?php if(!empty($post['image'])): ?>
                                 <img src="<?= base_url('uploads/posts/' . $post['image']) ?>" 
                                     class="featured-post-image" 
@@ -110,13 +123,13 @@ echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featu
                                     <?= substr(htmlspecialchars($post['description'], ENT_QUOTES, 'UTF-8'), 0, 150) . (strlen($post['description']) > 150 ? '...' : '') ?>
                                 </p>
                                 <div class="featured-post-footer">
-                                    <div class="featured-post-stats">
-                                        <span><i class="bi bi-heart"></i> <?= rand(500, 9999) ?></span>
-                                        <span><i class="bi bi-chat"></i> <?= rand(50, 999) ?></span>
-                                        <span><i class="bi bi-eye"></i> <?= number_format(rand(1000, 9999)) ?>k</span>
-                                    </div>
+                                <div class="featured-post-stats">
+                                    <?php $stats = get_post_stats($post['post_id']); ?>
+                                    <span><i class="bi bi-heart"></i> <?= $stats['likes'] ?></span>
+                                    <span><i class="bi bi-chat"></i> <?= $stats['comments'] ?></span>
                                 </div>
                             </div>
+                        </div>
                         </div>
                     </div>
                 <?php endforeach; ?>

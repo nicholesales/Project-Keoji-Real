@@ -85,6 +85,13 @@ $route['profile'] = 'UserController/profile';
 $route['user/profile'] = 'UserController/profile';
 $route['user/update-profile'] = 'UserController/updateProfile';
 
+// Admin routes
+$route['admin/dashboard'] = 'admincontroller/dashboard';
+$route['admin/users'] = 'admincontroller/users';
+$route['admin/user-posts/(:num)'] = 'admincontroller/userPosts/$1';
+$route['admin/delete-user/(:num)'] = 'admincontroller/deleteUser/$1';
+$route['admin/delete-post/(:num)'] = 'admincontroller/deletePost/$1';
+
 // Default routes
 $route['default_controller'] = 'welcome';
 $route['404_override'] = '';

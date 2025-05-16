@@ -59,7 +59,10 @@ body.dark-mode-preload,
         <!-- Sidebar -->
         <nav id="sidebar">
             <div class="sidebar-header">
-                <h3><i class="bi bi-journal-bookmark"></i> <span>Logo</span></h3>
+                <a href="<?= site_url() ?>" class="logo-link">
+                    <img src="<?= base_url('assets/images/logo/keoji-logo.png') ?>" alt="KEOJI Logo" class="logo-img">
+                    <span class="logo-text">PROJECT KEOJI</span>
+                </a>
             </div>
 
             <?php if ($this->session->userdata('isLoggedIn')): ?>

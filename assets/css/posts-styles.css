@@ -51,6 +51,61 @@ textarea#content {
     resize: vertical;
     padding: 10px;
 }
+
+.sidebar-header {
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-header .logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.sidebar-header .logo-img {
+    height: 32px; /* Small logo height */
+    width: auto;
+    margin-right: 10px; /* Space between logo and text */
+}
+
+.sidebar-header .logo-text {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #333; /* Default color for light mode */
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+/* Remove the yellow KEOJI text that comes with the logo */
+.sidebar-header .logo-img.original-logo {
+    object-fit: cover;
+    object-position: top; /* This will show only the colorful K part, not the yellow KEOJI text */
+    max-height: 32px;
+    overflow: hidden;
+}
+
+/* Dark mode support */
+body.dark-mode .sidebar-header {
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .sidebar-header .logo-text {
+    color: #e4e6eb; /* Light color for dark mode */
+}
+
+/* Responsive adjustments for small screens or collapsed sidebar */
+@media (max-width: 768px) {
+    .sidebar.collapsed .sidebar-header .logo-text {
+        display: none; /* Hide text when sidebar is collapsed */
+    }
+    
+    .sidebar.collapsed .sidebar-header .logo-img {
+        margin-right: 0; /* Remove margin when text is hidden */
+    }
+}
         
 
         #sidebar .sidebar-header {
