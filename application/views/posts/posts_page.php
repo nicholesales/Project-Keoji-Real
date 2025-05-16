@@ -37,9 +37,7 @@ echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featu
                     </div>
                     <div class="post-content">
                         <div class="post-title">
-                            <a href="<?= site_url('posts/view/' . $post['post_id']) ?>">
-                                <?= htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8') ?>
-                            </a>
+                            <span><?= htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8') ?></span>
                         </div>
                         <div class="post-meta">
                             <span class="status-badge <?= $post['status'] === 'draft' ? 'draft' : 'published' ?>">
@@ -573,106 +571,84 @@ $(document).ready(function() {
     
     // Enhanced edit post with animations
     $(document).on('click', '.edit-post', function() {
-        const postId = $(this).data('id');
-        
-        // Add loading animation to the post item
-        const postItem = $(this).closest('.post-item');
-        postItem.css({
-            'position': 'relative',
-            'overflow': 'hidden'
-        }).append('<div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-light bg-opacity-50"><div class="spinner-border text-primary" role="status"></div></div>');
-        
-        // Fetch post data
-        $.ajax({
-            url: '<?= site_url("PostsController/edit") ?>/' + postId,
-            type: 'GET',
-            dataType: 'json',
-            success: function(response) {
-                // Remove loading animation
-                postItem.find('.position-absolute').remove();
-                postItem.css({
-                    'position': '',
-                    'overflow': ''
-                });
+    const postId = $(this).data('id');
+    
+    // Add loading animation to the post item
+    const postItem = $(this).closest('.post-item');
+    postItem.css({
+        'position': 'relative',
+        'overflow': 'hidden'
+    }).append('<div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-light bg-opacity-50"><div class="spinner-border text-primary" role="status"></div></div>');
+    
+    // Fetch post data
+    $.ajax({
+        url: '<?= site_url("PostsController/edit") ?>/' + postId,
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            // Remove loading animation
+            postItem.find('.position-absolute').remove();
+            postItem.css({
+                'position': '',
+                'overflow': ''
+            });
+            
+            if (response.success) {
+                const post = response.post;
                 
-                if (response.success) {
-                    const post = response.post;
-                    
-                    // Fill form
-                    $('#postModalLabel').text('Edit Post');
-                    $('#post_id').val(post.post_id);
-                    $('#title').val(post.title);
-                    $('#category').val(post.category);
-                    $('#content').val(post.description);
-                    $('#featured').prop('checked', post.featured == 1);
-                    
-                    // Show image preview if available
-                    if (post.image) {
-                        $('#imagePreview').attr('src', '<?= base_url("uploads/posts") ?>/' + post.image);
-                        $('#imagePreviewContainer').removeClass('d-none');
-                    } else {
-                        $('#imagePreviewContainer').addClass('d-none');
-                    }
-                    
-                    // Image not required when editing
-                    $('#image').removeAttr('required');
-                    
-                    // Show modal with animation
-                    $('#postModal').modal('show');
-                    
-                    // Add a slight entrance animation for form elements
-                    $('.modal-body .mb-3').each(function(index) {
-                        $(this).css({
-                            'opacity': '0',
-                            'transform': 'translateY(20px)'
-                        });
-                        
-                        setTimeout(() => {
-                            $(this).css({
-                                'transition': 'all 0.3s ease',
-                                'opacity': '1',
-                                'transform': 'translateY(0)'
-                            });
-                        }, 100 + (index * 50));
-                    });
+                // Fill form
+                $('#postModalLabel').text('Edit Post');
+                $('#post_id').val(post.post_id);
+                $('#title').val(post.title);
+                $('#category').val(post.category);
+                $('#content').val(post.description);
+                $('#featured').prop('checked', post.featured == 1);
+                
+                // SOLUTION FOR PROBLEM #1: Hide Save as Draft button for published posts
+                if (post.status === 'published') {
+                    // Hide Save as Draft button
+                    $('#saveDraftBtn').hide();
                 } else {
-                    // Show error toast
-                    $('body').append(
-                        '<div class="position-fixed top-0 end-0 p-3" style="z-index: 9999">' +
-                        '<div class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">' +
-                        '<div class="d-flex">' +
-                        '<div class="toast-body">Error: ' + response.message + '</div>' +
-                        '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>' +
-                        '</div>' +
-                        '</div>' +
-                        '</div>'
-                    );
-                    
-                    // Show toast with Bootstrap 5
-                    if (typeof bootstrap !== 'undefined') {
-                        const toastEl = document.querySelector('.toast');
-                        const toast = new bootstrap.Toast(toastEl, { delay: 5000 });
-                        toast.show();
-                    } else {
-                        // Fallback for Bootstrap 4
-                        $('.toast').toast({ delay: 5000 }).toast('show');
-                    }
+                    // Show Save as Draft button for draft posts
+                    $('#saveDraftBtn').show();
                 }
-            },
-            error: function(xhr) {
-                // Remove loading animation
-                postItem.find('.position-absolute').remove();
-                postItem.css({
-                    'position': '',
-                    'overflow': ''
-                });
                 
+                // Show image preview if available
+                if (post.image) {
+                    $('#imagePreview').attr('src', '<?= base_url("uploads/posts") ?>/' + post.image);
+                    $('#imagePreviewContainer').removeClass('d-none');
+                } else {
+                    $('#imagePreviewContainer').addClass('d-none');
+                }
+                
+                // Image not required when editing
+                $('#image').removeAttr('required');
+                
+                // Show modal with animation
+                $('#postModal').modal('show');
+                
+                // Add a slight entrance animation for form elements
+                $('.modal-body .mb-3').each(function(index) {
+                    $(this).css({
+                        'opacity': '0',
+                        'transform': 'translateY(20px)'
+                    });
+                    
+                    setTimeout(() => {
+                        $(this).css({
+                            'transition': 'all 0.3s ease',
+                            'opacity': '1',
+                            'transform': 'translateY(0)'
+                        });
+                    }, 100 + (index * 50));
+                });
+            } else {
                 // Show error toast
                 $('body').append(
                     '<div class="position-fixed top-0 end-0 p-3" style="z-index: 9999">' +
                     '<div class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">' +
                     '<div class="d-flex">' +
-                    '<div class="toast-body">An error occurred. Status: ' + xhr.status + '</div>' +
+                    '<div class="toast-body">Error: ' + response.message + '</div>' +
                     '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>' +
                     '</div>' +
                     '</div>' +
@@ -689,8 +665,39 @@ $(document).ready(function() {
                     $('.toast').toast({ delay: 5000 }).toast('show');
                 }
             }
-        });
+        },
+        error: function(xhr) {
+            // Remove loading animation
+            postItem.find('.position-absolute').remove();
+            postItem.css({
+                'position': '',
+                'overflow': ''
+            });
+            
+            // Show error toast
+            $('body').append(
+                '<div class="position-fixed top-0 end-0 p-3" style="z-index: 9999">' +
+                '<div class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">' +
+                '<div class="d-flex">' +
+                '<div class="toast-body">An error occurred. Status: ' + xhr.status + '</div>' +
+                '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>' +
+                '</div>' +
+                '</div>' +
+                '</div>'
+            );
+            
+            // Show toast with Bootstrap 5
+            if (typeof bootstrap !== 'undefined') {
+                const toastEl = document.querySelector('.toast');
+                const toast = new bootstrap.Toast(toastEl, { delay: 5000 });
+                toast.show();
+            } else {
+                // Fallback for Bootstrap 4
+                $('.toast').toast({ delay: 5000 }).toast('show');
+            }
+        }
     });
+});
     
     // Delete post with enhanced confirmation
     $(document).on('click', '.delete-post', function() {
@@ -931,5 +938,9 @@ $(document).ready(function() {
     
     // Removed event handlers for publish-draft and publishAllBtn
     // Since these buttons have been removed from the UI
+});
+$(document).on('click', '.post-item .post-title a', function(e) {
+    e.preventDefault(); // Prevents the default link behavior
+    return false;      // Stops the event propagation
 });
 </script>

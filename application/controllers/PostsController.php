@@ -350,7 +350,7 @@ class PostsController extends MY_Controller
             'message' => 'Post deleted successfully'
         ]);
     }
-    public function get_drafts()
+  public function get_drafts()
 {
     // Debug information
     log_message('debug', '==== get_drafts() called ====');
@@ -376,20 +376,30 @@ class PostsController extends MY_Controller
         $user_id = $this->session->userdata('user_id');
         log_message('debug', 'User ID: ' . $user_id);
         
-        // Get draft posts for this user
-        $this->db->where('user_id', $user_id);
-        $this->db->where('status', 'draft');
-        $this->db->order_by('date_created', 'DESC');
+        // IMPORTANT: Reset query builder to prevent conflicts
+        $this->db->reset_query();
         
-        // Debug database query
-        $query = $this->db->get_compiled_select('posts_table');
-        log_message('debug', 'SQL Query: ' . $query);
+        // Get draft posts for this user - Direct query approach
+        $query = $this->db->select('*')
+                         ->from('posts_table')
+                         ->where('user_id', $user_id)
+                         ->where('status', 'draft')
+                         ->order_by('date_created', 'DESC')
+                         ->get();
         
-        // Get drafts posts
-        $drafts = $this->post_model->get_all();
+        // Log the SQL query for debugging
+        log_message('debug', 'SQL Query: ' . $this->db->last_query());
+        
+        // Get the results as an array
+        $drafts = $query->result_array();
         log_message('debug', 'Number of drafts found: ' . count($drafts));
         
-        // Prepare the HTML for drafts - MODIFIED to remove Publish All button and checkmark icons
+        // Debug: Log the post IDs and statuses
+        foreach ($drafts as $draft) {
+            log_message('debug', 'Post ID: ' . $draft['post_id'] . ', Title: ' . $draft['title'] . ', Status: ' . $draft['status']);
+        }
+        
+        // Prepare the HTML for drafts
         $html = '';
         
         if (empty($drafts)) {
@@ -398,8 +408,6 @@ class PostsController extends MY_Controller
             $html .= '<p>No draft posts yet. Save a post as draft to see it here!</p>';
             $html .= '</div>';
         } else {
-            // Removed the "Publish All" button section
-            
             foreach ($drafts as $draft) {
                 $html .= '<div class="draft-item" data-post-id="' . $draft['post_id'] . '">';
                 $html .= '<div class="draft-icon">';
@@ -415,7 +423,6 @@ class PostsController extends MY_Controller
                 $html .= '</div>';
                 $html .= '</div>';
                 $html .= '<div class="draft-actions">';
-                // Removed the publish button
                 $html .= '<button class="action-btn edit-post" data-id="' . $draft['post_id'] . '" title="Edit">';
                 $html .= '<i class="bi bi-pencil"></i>';
                 $html .= '</button>';

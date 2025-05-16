@@ -221,7 +221,17 @@ textarea#content {
         .post-item:hover {
             background-color: #f8f9fa;
         }
-
+        .post-item .post-title a {
+            pointer-events: none; 
+            cursor: default;     
+            text-decoration: none; 
+            color: inherit;      
+        }
+        .post-item .post-title a:hover {
+            text-decoration: none;
+            color: inherit;
+            background-color: transparent;
+        }
         /* Sidebar Icons */
         .sidebar-icon {
             width: 20px;
