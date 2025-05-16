@@ -77,7 +77,7 @@
 
             <?php if ($this->session->userdata('isLoggedIn')): ?>
                 <div class="sidebar-footer">
-                    <a href="<?= site_url('auth/logout') ?>" class="btn btn-outline-danger btn-sm w-100">
+                    <a href="<?= site_url('auth/login') ?>" class="btn btn-outline-danger btn-sm w-100">
                         <i class="bi bi-box-arrow-right"></i> <span>Logout</span>
                     </a>
                 </div>
@@ -123,7 +123,7 @@
                                     <li>
                                         <hr class="dropdown-divider">
                                     </li>
-                                    <li><a class="dropdown-item" href="<?= site_url('auth/logout') ?>">Logout</a></li>
+                                    <li><a class="dropdown-item" href="<?= site_url('auth/login') ?>">Logout</a></li>
                                 </ul>
                             </div>
                         <?php else: ?>
