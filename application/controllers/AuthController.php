@@ -133,53 +133,59 @@ class AuthController extends MY_Controller
     }
 
     // Process login
-    public function processLogin()
-    {
-        // Validate form data
-        $this->form_validation->set_rules('username', 'Username', 'required');
-        $this->form_validation->set_rules('password', 'Password', 'required');
+ // In your AuthController.php - modify the processLogin method
+public function processLogin()
+{
+    // Validate form data
+    $this->form_validation->set_rules('username', 'Username', 'required');
+    $this->form_validation->set_rules('password', 'Password', 'required');
 
-        if ($this->form_validation->run() == FALSE) {
-            $this->session->set_flashdata('errors', $this->form_validation->error_array());
-            redirect('auth/login');
-        }
+    if ($this->form_validation->run() == FALSE) {
+        $this->session->set_flashdata('errors', $this->form_validation->error_array());
+        redirect('auth/login');
+    }
 
-        $username = $this->input->post('username');
-        $password = $this->input->post('password');
+    $username = $this->input->post('username');
+    $password = $this->input->post('password');
 
-        // Check if username exists
-        $user = $this->user_model->get_where('username', $username);
+    // Check if username exists
+    $user = $this->user_model->get_where('username', $username);
 
-        if (!$user) {
-            $this->session->set_flashdata('error', 'Invalid username or password');
-            redirect('auth/login');
-        }
+    if (!$user) {
+        $this->session->set_flashdata('error', 'Invalid username or password');
+        redirect('auth/login');
+    }
 
-        // Verify password
-        if (!password_verify($password, $user['password'])) {
-            $this->session->set_flashdata('error', 'Invalid username or password');
-            redirect('auth/login');
-        }
+    // Verify password
+    if (!password_verify($password, $user['password'])) {
+        $this->session->set_flashdata('error', 'Invalid username or password');
+        redirect('auth/login');
+    }
 
-        // Set session data
-        $sessionData = [
-            'user_id' => $user['user_id'],
-            'username' => $user['username'],
-            'email' => $user['email'],
-            'is_admin' => $user['is_admin'],
-            'isLoggedIn' => true
-        ];
+    // Set session data
+    $sessionData = [
+        'user_id' => $user['user_id'],
+        'username' => $user['username'],
+        'email' => $user['email'],
+        'is_admin' => $user['is_admin'],
+        'isLoggedIn' => true
+    ];
 
-        // Add profile photo to session if exists
-        if (isset($user['profile_photo']) && $user['profile_photo']) {
-            $sessionData['profile_photo'] = $user['profile_photo'];
-        }
+    // Add profile photo to session if exists
+    if (isset($user['profile_photo']) && $user['profile_photo']) {
+        $sessionData['profile_photo'] = $user['profile_photo'];
+    }
 
-        $this->session->set_userdata($sessionData);
+    $this->session->set_userdata($sessionData);
 
-        // Redirect to feed page
+    // Redirect based on user role
+    if ($user['is_admin']) {
+        redirect('admin/dashboard');
+    } else {
+        // Redirect regular users to feed page
         redirect('posts');
     }
+}
 
     // Logout
     public function logout()
