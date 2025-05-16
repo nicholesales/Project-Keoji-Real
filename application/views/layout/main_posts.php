@@ -85,7 +85,7 @@ body.dark-mode-preload,
                         <i class="bi bi-rss sidebar-icon"></i> Feed
                     </a>
                 </li>
-                <li class="active">
+                <li <?= $this->uri->segment(1) == 'posts' ? 'class="active"' : '' ?>>
                     <a href="<?= site_url('posts') ?>">
                         <i class="bi bi-file-earmark-text sidebar-icon"></i><span>Post</span>
                         <?php if(isset($post_count) && $post_count > 0): ?>
