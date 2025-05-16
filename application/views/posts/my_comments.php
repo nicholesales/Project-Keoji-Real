@@ -3,7 +3,7 @@
         <h2>My Comments</h2>
     </div>
     
-    <div class="comments-container posts-container">  <!-- Added posts-container class for consistent styling -->
+    <div class="comments-container posts-container">
         <?php if (empty($comments)): ?>
             <div class="empty-state">
                 <i class="bi bi-chat-dots"></i>
@@ -14,20 +14,21 @@
             
             <?php foreach ($comments as $comment): ?>
                 <div class="user-comment-item" data-comment-id="<?= $comment['comment_id'] ?>">
-                    <div class="comment-post-info">
-                        <div class="post-title">
-                            <a href="<?= site_url('posts/view/' . $comment['post_id']) ?>">
+                    <a href="<?= site_url('posts/view/' . $comment['post_id']) ?>" class="comment-link">
+                        <div class="comment-post-info">
+                            <div class="post-title">
                                 <?= htmlspecialchars($comment['post_title']) ?>
-                            </a>
+                                <i class="bi bi-arrow-right-circle"></i>
+                            </div>
+                            <div class="post-author">
+                                <span>Posted by: <?= htmlspecialchars($comment['username']) ?></span>
+                            </div>
                         </div>
-                        <div class="post-author">
-                            <span>Posted by: <?= htmlspecialchars($comment['username']) ?></span>
+                        
+                        <div class="comment-content">
+                            <?= nl2br(htmlspecialchars($comment['comment_text'])) ?>
                         </div>
-                    </div>
-                    
-                    <div class="comment-content">
-                        <?= nl2br(htmlspecialchars($comment['comment_text'])) ?>
-                    </div>
+                    </a>
                     
                     <div class="comment-meta">
                         <div class="comment-date">
@@ -48,17 +49,32 @@
 
 <script>
 $(document).ready(function() {
+    // Add hover effects to delete button
+    $('.delete-comment').hover(
+        function() {
+            $(this).find('i').removeClass('bi-trash').addClass('bi-trash-fill');
+        },
+        function() {
+            $(this).find('i').removeClass('bi-trash-fill').addClass('bi-trash');
+        }
+    );
+    
     // Delete Comment
-    $('.delete-comment').on('click', function() {
+    $('.delete-comment').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation(); // Prevent the click from propagating to the parent link
+        
+        var commentId = $(this).data('id');
+        var commentElement = $(this).closest('.user-comment-item');
+        
         if (confirm('Are you sure you want to delete this comment?')) {
-            var commentId = $(this).data('id');
-            var commentElement = $(this).closest('.user-comment-item');
-            
             $.ajax({
                 url: '<?= site_url('comments/delete/') ?>' + commentId,
                 type: 'POST',
                 dataType: 'json',
                 success: function(response) {
+                    console.log('Response:', response);
+                    
                     if (response.success) {
                         commentElement.fadeOut(300, function() {
                             $(this).remove();
@@ -70,20 +86,23 @@ $(document).ready(function() {
                             
                             // Show empty state if no comments left
                             if (count === 0) {
-                                $('.comments-container').html(`
-                                    <div class="empty-state">
-                                        <i class="bi bi-chat-dots"></i>
-                                        <p>You haven't made any comments yet.</p>
-                                    </div>
-                                `);
+                                $('.comments-container').html(
+                                    '<div class="empty-state">' +
+                                    '<i class="bi bi-chat-dots"></i>' +
+                                    '<p>You haven\'t made any comments yet.</p>' +
+                                    '</div>'
+                                );
                             }
                         });
                     } else {
                         alert(response.message);
                     }
                 },
-                error: function() {
-                    alert('An error occurred while deleting the comment.');
+                error: function(xhr, status, error) {
+                    console.log('Error:', error);
+                    console.log('Status:', status);
+                    console.log('Response:', xhr.responseText);
+                    alert('An error occurred: ' + error);
                 }
             });
         }
