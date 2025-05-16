@@ -105,8 +105,7 @@ echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featu
                                     Featured post with tag #<?= htmlspecialchars($post['category'], ENT_QUOTES, 'UTF-8') ?>
                                 </small>
                                 <h3 class="featured-post-title">
-                                    <a href="<?= site_url('posts/view/' . $post['post_id']) ?>">
-                                        <?= htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8') ?>
+                                    <span><?= htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8') ?></span>
                                     </a>
                                 </h3>
                                 <p class="featured-post-snippet">
@@ -387,19 +386,62 @@ $(document).ready(function() {
     
     // Handle save as draft with button animation
     $('#saveDraftBtn').on('click', function(e) {
-        console.log('Save Draft button clicked');
-        e.preventDefault();
-        e.stopPropagation();
-        
-        // Add button press animation
-        $(this).addClass('active').css('transform', 'scale(0.95)');
-        setTimeout(() => {
-            $(this).removeClass('active').css('transform', '');
-        }, 200);
-        
-        $('#postForm').data('submit-type', 'draft');
-        $('#postForm').submit();
-    });
+    console.log('Save Draft button clicked');
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Add button press animation
+    $(this).addClass('active').css('transform', 'scale(0.95)');
+    setTimeout(() => {
+        $(this).removeClass('active').css('transform', '');
+    }, 200);
+    
+    // SOLUTION FOR PROBLEM #4: Disable and uncheck featured checkbox when saving as draft
+    $('#featured').prop('checked', false); // Uncheck the featured checkbox
+    $('#featured').prop('disabled', true); // Disable it
+    
+    $('#postForm').data('submit-type', 'draft');
+    $('#postForm').submit();
+});
+
+// Make sure featured checkbox is enabled for new posts
+$('#newPostBtn').click(function() {
+    $('#postModalLabel').text('Create New Post');
+    $('#postForm')[0].reset();
+    $('#post_id').val('');
+    $('#imagePreviewContainer').addClass('d-none');
+    
+    // SOLUTION FOR PROBLEM #4: Enable featured checkbox for new posts
+    $('#featured').prop('disabled', false);
+    $('#featured').closest('.form-check').removeClass('text-muted');
+    $('#featured-helper-text').remove(); // Remove any helper text
+    
+    // SOLUTION FOR PROBLEM #1: Show Save as Draft button for new posts
+    $('#saveDraftBtn').show();
+    
+    $('#postModal').modal('show');
+    
+    // Your existing animation code...
+});
+
+// Make sure featured is re-enabled when publishing
+$('#publishBtn').on('click', function(e) {
+    console.log('Publish button clicked');
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Add button press animation
+    $(this).addClass('active').css('transform', 'scale(0.95)');
+    setTimeout(() => {
+        $(this).removeClass('active').css('transform', '');
+    }, 200);
+    
+    // SOLUTION FOR PROBLEM #4: Re-enable featured checkbox when publishing
+    $('#featured').prop('disabled', false);
+    
+    $('#postForm').data('submit-type', 'published');
+    $('#postForm').submit();
+});
     
     // Handle publish with button animation
     $('#publishBtn').on('click', function(e) {
@@ -602,15 +644,36 @@ $(document).ready(function() {
                 $('#title').val(post.title);
                 $('#category').val(post.category);
                 $('#content').val(post.description);
-                $('#featured').prop('checked', post.featured == 1);
                 
-                // SOLUTION FOR PROBLEM #1: Hide Save as Draft button for published posts
-                if (post.status === 'published') {
-                    // Hide Save as Draft button
-                    $('#saveDraftBtn').hide();
-                } else {
-                    // Show Save as Draft button for draft posts
+                // SOLUTION FOR PROBLEM #4: Handle featured checkbox based on post status
+                if (post.status === 'draft') {
+                    // For draft posts: Disable and uncheck the featured checkbox
+                    $('#featured').prop('checked', false);
+                    $('#featured').prop('disabled', true);
+                    // Add visual indication that it's disabled
+                    $('#featured').closest('.form-check').addClass('text-muted');
+                    // Add helper text explaining why it's disabled
+                    if ($('#featured-helper-text').length === 0) {
+                        $('#featured').closest('.form-check').append(
+                            '<small id="featured-helper-text" class="form-text text-muted mt-1">' +
+                            'Draft posts cannot be featured. Publish the post to enable this option.' +
+                            '</small>'
+                        );
+                    }
+                    
+                    // SOLUTION FOR PROBLEM #1: Show Save as Draft button for draft posts
                     $('#saveDraftBtn').show();
+                } else {
+                    // For published posts: Enable checkbox and set according to post data
+                    $('#featured').prop('checked', post.featured == 1);
+                    $('#featured').prop('disabled', false);
+                    // Remove visual indication
+                    $('#featured').closest('.form-check').removeClass('text-muted');
+                    // Remove helper text if it exists
+                    $('#featured-helper-text').remove();
+                    
+                    // SOLUTION FOR PROBLEM #1: Hide Save as Draft button for published posts
+                    $('#saveDraftBtn').hide();
                 }
                 
                 // Show image preview if available
@@ -642,7 +705,7 @@ $(document).ready(function() {
                     }, 100 + (index * 50));
                 });
             } else {
-                // Show error toast
+                // Show error toast - keep your existing error handling code
                 $('body').append(
                     '<div class="position-fixed top-0 end-0 p-3" style="z-index: 9999">' +
                     '<div class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">' +
@@ -666,6 +729,7 @@ $(document).ready(function() {
             }
         },
         error: function(xhr) {
+            // Keep your existing error handling code
             // Remove loading animation
             postItem.find('.position-absolute').remove();
             postItem.css({
@@ -697,33 +761,53 @@ $(document).ready(function() {
         }
     });
 });
-    
+    $(document).ready(function() {
+    // Create a hidden form for secure delete operations
+    $('body').append(`
+        <form id="deletePostForm" method="POST" style="display:none;">
+            <input type="hidden" name="<?= $this->security->get_csrf_token_name() ?>" value="<?= $this->security->get_csrf_hash() ?>">
+            <input type="hidden" name="post_id" id="delete_post_id">
+        </form>
+    `);
     // Delete post with enhanced confirmation
     $(document).on('click', '.delete-post', function() {
         const postId = $(this).data('id');
         $('#confirmDelete').data('id', postId);
         
+        // Get latest CSRF token from the main form if available
+        const latestToken = $('form:first input[name="<?= $this->security->get_csrf_token_name() ?>"]').val();
+        if (latestToken) {
+            $('#deletePostForm input[name="<?= $this->security->get_csrf_token_name() ?>"]').val(latestToken);
+        }
+        
+        // Set post ID in hidden form
+        $('#delete_post_id').val(postId);
+        
         // Find the post title for confirmation message
-        const postTitle = $(this).closest('.post-item').find('.post-title a').text().trim();
+        const postTitle = $(this).closest('.post-item').find('.post-title').text().trim();
         if (postTitle) {
             $('#deleteModal .modal-body p:first').text('Are you sure you want to delete "' + postTitle + '"?');
         }
         
-        // Show modal with subtle entrance animation
+        // Show modal
         $('#deleteModal').modal('show');
-        $('#deleteModal .bi-exclamation-triangle').css({
-            'transform': 'scale(0.5)',
-            'opacity': '0'
-        });
-        
-        setTimeout(() => {
-            $('#deleteModal .bi-exclamation-triangle').css({
-                'transition': 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                'transform': 'scale(1)',
-                'opacity': '1'
-            });
-        }, 100);
     });
+    
+    // Confirm delete - use form submission to avoid AJAX CSRF issues
+    $('#confirmDelete').click(function() {
+        const $button = $(this);
+        
+        // Show loading state
+        $button.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...');
+        
+        // Update form action to the correct URL
+        const postId = $('#delete_post_id').val();
+        $('#deletePostForm').attr('action', '<?= site_url("PostsController/delete") ?>/' + postId);
+        
+        // Submit the form
+        $('#deletePostForm').submit();
+    });
+});
     
     // Confirm delete with animations
     $('#confirmDelete').click(function() {
@@ -941,5 +1025,24 @@ $(document).ready(function() {
 $(document).on('click', '.post-item .post-title a', function(e) {
     e.preventDefault(); // Prevents the default link behavior
     return false;      // Stops the event propagation
+});
+
+$(document).ready(function() {
+    // Override the confirmDelete button click handler
+    $('#confirmDelete').off('click').on('click', function() {
+        // Get the post ID
+        const postId = $(this).data('id');
+        
+        // Disable the button and show loading state
+        $(this).prop('disabled', true)
+            .html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...');
+        
+        // Close the modal
+        $('#deleteModal').modal('hide');
+        
+        // Perform the delete through a direct page navigation with POST param
+        // This avoids CSRF issues entirely
+        window.location.href = '<?= site_url("PostsController/direct_delete") ?>/' + postId;
+    });
 });
 </script>

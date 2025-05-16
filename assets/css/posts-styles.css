@@ -1769,3 +1769,23 @@ textarea.comment-textarea:focus {
         max-height: 300px;
     }
 }
+
+.form-check.text-muted {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Helper text explaining why the checkbox is disabled */
+#featured-helper-text {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-top: 5px;
+    display: block;
+}
+
+/* Visual indication for disabled checkbox */
+.form-check.text-muted .form-check-input {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+    cursor: not-allowed;
+}
