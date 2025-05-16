@@ -45,16 +45,17 @@
                 <li>
                     <a href="<?= site_url('posts/create') ?>">
                         <i class="bi bi-grid sidebar-icon"></i><span>Feed</span>
-                        <?php if(isset($post_count) && $post_count > 0): ?>
-                            <span class="nav-count"><?= $post_count ?></span>
-                        <?php elseif($this->session->userdata('post_count') && $this->session->userdata('post_count') > 0): ?>
-                            <span class="nav-count"><?= $this->session->userdata('post_count') ?></span>
-                        <?php endif; ?>
+                        
                     </a>
                 </li>
                 <li class="active">
                     <a href="<?= site_url('posts') ?>">
                         <i class="bi bi-file-earmark-text sidebar-icon"></i><span>Post</span>
+                        <?php if(isset($post_count) && $post_count > 0): ?>
+                            <span class="nav-count"><?= $post_count ?></span>
+                        <?php elseif($this->session->userdata('post_count') && $this->session->userdata('post_count') > 0): ?>
+                            <span class="nav-count"><?= $this->session->userdata('post_count') ?></span>
+                        <?php endif; ?>
                     </a>
                 </li>
                 <?php if ($this->session->userdata('isLoggedIn')): ?>
