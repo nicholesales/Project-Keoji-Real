@@ -2,6 +2,38 @@
 <html lang="en">
 
 <head>
+    <script>
+// Immediately apply dark mode if it was previously enabled
+(function() {
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.documentElement.classList.add('dark-mode-preload');
+        document.body.classList.add('dark-mode-preload');
+    }
+})();
+</script>
+
+<style>
+/* Critical dark mode styles to prevent flash */
+html.dark-mode-preload,
+body.dark-mode-preload,
+.dark-mode-preload #sidebar,
+.dark-mode-preload .navbar,
+.dark-mode-preload #content {
+    background-color: #121212 !important;
+    color: #e4e6eb !important;
+    transition: none !important;
+}
+
+.dark-mode-preload .navbar {
+    background-color: #1e1e1e !important;
+    border-bottom: 1px solid #2c2c2c !important;
+}
+
+.dark-mode-preload #sidebar {
+    background-color: #1e1e1e !important;
+    color: #e4e6eb !important;
+}
+</style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= isset($title) ? $title : 'Blog App' ?></title>
@@ -16,6 +48,10 @@
 
       <!-- CSS -->
     <link rel="stylesheet" href="<?= base_url('assets/css/posts-styles.css'); ?>">
+
+    <link rel="stylesheet" href="<?= base_url('assets/css/posts-styles.css'); ?>">
+    <!-- Dark Mode styles -->
+    <link rel="stylesheet" href="<?= base_url('assets/css/dark-mode.css'); ?>">
 </head>
 
 <body>
@@ -49,7 +85,7 @@
                         <i class="bi bi-rss sidebar-icon"></i> Feed
                     </a>
                 </li>
-                <li class="active">
+                <li <?= $this->uri->segment(1) == 'posts' ? 'class="active"' : '' ?>>
                     <a href="<?= site_url('posts') ?>">
                         <i class="bi bi-file-earmark-text sidebar-icon"></i><span>Post</span>
                         <?php if(isset($post_count) && $post_count > 0): ?>
@@ -104,7 +140,8 @@
                     <h4 class="m-0">POST</h4>
 
                     <div class="ms-auto d-flex align-items-center">
-                        <button class="btn btn-link position-relative me-3" aria-label="Theme Toggle">
+                        <button class="btn btn-link position-relative me-3" 
+                                aria-label="Toggle dark mode">
                             <i class="bi bi-moon-fill text-dark"></i>
                         </button>
                         <?php if ($this->session->userdata('isLoggedIn')): ?>
@@ -229,6 +266,7 @@
             });
         });
     </script>
+    <script src="<?= base_url('assets/js/dark-mode.js'); ?>"></script>
 </body>
 
 </html>

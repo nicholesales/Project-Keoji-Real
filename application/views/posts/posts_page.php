@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="<?= base_url('assets/css/posts_page.css'); ?>">
-
 <?php 
 // Debug data
 echo '<!-- Debug: recentPosts count: ' . (isset($recentPosts) ? count($recentPosts) : 'not set') . ' -->';
@@ -89,8 +87,8 @@ echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featu
             <!-- Carousel items with enhanced fade-right transition -->
             <div class="carousel-inner">
                 <?php foreach($featuredPosts as $index => $post): ?>
-                    <div class="carousel-item <?= $index === 0 ? 'active' : '' ?>">
-                        <div class="featured-post-item">
+                  <div class="carousel-item <?= $index === 0 ? 'active' : '' ?>" data-post-id="<?= $post['post_id'] ?>">
+    <div class="featured-post-item" data-post-id="<?= $post['post_id'] ?>">
                             <?php if(!empty($post['image'])): ?>
                                 <img src="<?= base_url('uploads/posts/' . $post['image']) ?>" 
                                     class="featured-post-image" 
@@ -1022,27 +1020,69 @@ $(document).ready(function() {
     // Removed event handlers for publish-draft and publishAllBtn
     // Since these buttons have been removed from the UI
 });
+
 $(document).on('click', '.post-item .post-title a', function(e) {
     e.preventDefault(); // Prevents the default link behavior
     return false;      // Stops the event propagation
 });
 
 $(document).ready(function() {
-    // Override the confirmDelete button click handler
-    $('#confirmDelete').off('click').on('click', function() {
-        // Get the post ID
-        const postId = $(this).data('id');
+    // Make featured post items clickable in carousel
+    $('.carousel-item').each(function() {
+        // Add cursor pointer to indicate clickability
+        $(this).css('cursor', 'pointer');
         
-        // Disable the button and show loading state
-        $(this).prop('disabled', true)
-            .html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...');
+        // Get post id from featured post item inside if available
+        const postItem = $(this).find('.featured-post-item');
+        if (postItem.length && !$(this).data('post-id')) {
+            const postId = postItem.data('post-id');
+            if (postId) {
+                $(this).attr('data-post-id', postId);
+            }
+        }
+    });
+    
+    // Add click handler to carousel items
+    $(document).on('click', '.carousel-item', function(e) {
+        // Ignore clicks on carousel controls and buttons
+        if ($(e.target).closest('.carousel-control-prev, .carousel-control-next, .carousel-indicators, button, .featured-post-stats').length === 0) {
+            const postId = $(this).data('post-id');
+            if (postId) {
+                window.location.href = '<?= site_url("posts/view") ?>/' + postId;
+            }
+        }
+    });
+    
+    // Add click handler specifically for featured post titles and images
+    $(document).on('click', '.featured-post-title, .featured-post-image', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
         
-        // Close the modal
-        $('#deleteModal').modal('hide');
+        const postId = $(this).closest('.carousel-item').data('post-id') || 
+                      $(this).closest('.featured-post-item').data('post-id');
         
-        // Perform the delete through a direct page navigation with POST param
-        // This avoids CSRF issues entirely
-        window.location.href = '<?= site_url("PostsController/direct_delete") ?>/' + postId;
+        if (postId) {
+            window.location.href = '<?= site_url("posts/view") ?>/' + postId;
+        }
+    });
+    
+    // Make sure feed post items are clickable too
+    $(document).on('click', '.feed-post-item', function(e) {
+        // Don't navigate if clicking action buttons or links
+        if (!$(e.target).closest('.action-btn, .action-buttons, button, a, textarea').length) {
+            const postId = $(this).data('post-id');
+            if (postId) {
+                window.location.href = '<?= site_url("posts/view") ?>/' + postId;
+            }
+        }
+    });
+    
+    // Ensure feed post titles are clickable
+    $(document).on('click', '.feed-post-title', function(e) {
+        const postId = $(this).closest('.feed-post-item').data('post-id');
+        if (postId) {
+            window.location.href = '<?= site_url("posts/view") ?>/' + postId;
+        }
     });
 });
 </script>
