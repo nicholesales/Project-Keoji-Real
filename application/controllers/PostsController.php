@@ -311,45 +311,59 @@ class PostsController extends MY_Controller
     }
     
     // Delete a post
-    public function delete($id = null)
-    {
-        // Simplified security check
-        if (!$this->input->is_ajax_request()) {
-            show_error('Direct access not allowed.');
-            return;
-        }
-        
-        // Check if user is logged in
-        if (!$this->session->userdata('isLoggedIn')) {
-            echo json_encode(['success' => false, 'message' => 'User not logged in']);
-            return;
-        }
-        
-        $post = $this->post_model->get($id);
-        
-        // Check if post exists and belongs to the user
-        if (!$post || $post['user_id'] != $this->session->userdata('user_id')) {
-            echo json_encode(['success' => false, 'message' => 'Post not found or access denied']);
-            return;
-        }
-        
-        // Delete image file
-        if (file_exists(FCPATH . 'uploads/posts/' . $post['image'])) {
-            unlink(FCPATH . 'uploads/posts/' . $post['image']);
-        }
-        
-        // Delete post from database
-        $this->post_model->delete($id);
-        
-        // Update the post count in session
-        $post_count = $this->post_model->count_by_user($this->session->userdata('user_id'));
-        $this->session->set_userdata('post_count', $post_count);
-        
-        echo json_encode([
-            'success' => true, 
-            'message' => 'Post deleted successfully'
-        ]);
+    public function delete($post_id = null)
+{
+    // Get post ID from URL or form
+    if (!$post_id) {
+        $post_id = $this->input->post('post_id');
     }
+    
+    if (!$post_id) {
+        // No post ID provided
+        $this->session->set_flashdata('error', 'No post ID provided');
+        redirect('posts');
+        return;
+    }
+    
+    // Get post details before deleting
+    $post = $this->post_model->get($post_id);
+    
+    if (!$post) {
+        $this->session->set_flashdata('error', 'Post not found');
+        redirect('posts');
+        return;
+    }
+    
+    // Check if user has permission to delete this post
+    if ($this->session->userdata('user_id') && $post['user_id'] != $this->session->userdata('user_id')) {
+        $this->session->set_flashdata('error', 'You do not have permission to delete this post');
+        redirect('posts');
+        return;
+    }
+    
+    // Delete post record from database
+    $deleted = $this->post_model->delete($post_id);
+    
+    if (!$deleted) {
+        $this->session->set_flashdata('error', 'Failed to delete post');
+        redirect('posts');
+        return;
+    }
+    
+    // Handle image deletion if post had an image
+    if (!empty($post['image'])) {
+        $image_path = FCPATH . 'uploads/posts/' . $post['image'];
+        if (file_exists($image_path)) {
+            @unlink($image_path);
+        }
+    }
+    
+    // Set success message
+    $this->session->set_flashdata('message', 'Post deleted successfully');
+    
+    // Redirect back to posts page
+    redirect('posts');
+}
   public function get_drafts()
 {
     // Debug information

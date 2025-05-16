@@ -762,33 +762,53 @@ $('#publishBtn').on('click', function(e) {
         }
     });
 });
-    
+    $(document).ready(function() {
+    // Create a hidden form for secure delete operations
+    $('body').append(`
+        <form id="deletePostForm" method="POST" style="display:none;">
+            <input type="hidden" name="<?= $this->security->get_csrf_token_name() ?>" value="<?= $this->security->get_csrf_hash() ?>">
+            <input type="hidden" name="post_id" id="delete_post_id">
+        </form>
+    `);
     // Delete post with enhanced confirmation
     $(document).on('click', '.delete-post', function() {
         const postId = $(this).data('id');
         $('#confirmDelete').data('id', postId);
         
+        // Get latest CSRF token from the main form if available
+        const latestToken = $('form:first input[name="<?= $this->security->get_csrf_token_name() ?>"]').val();
+        if (latestToken) {
+            $('#deletePostForm input[name="<?= $this->security->get_csrf_token_name() ?>"]').val(latestToken);
+        }
+        
+        // Set post ID in hidden form
+        $('#delete_post_id').val(postId);
+        
         // Find the post title for confirmation message
-        const postTitle = $(this).closest('.post-item').find('.post-title a').text().trim();
+        const postTitle = $(this).closest('.post-item').find('.post-title').text().trim();
         if (postTitle) {
             $('#deleteModal .modal-body p:first').text('Are you sure you want to delete "' + postTitle + '"?');
         }
         
-        // Show modal with subtle entrance animation
+        // Show modal
         $('#deleteModal').modal('show');
-        $('#deleteModal .bi-exclamation-triangle').css({
-            'transform': 'scale(0.5)',
-            'opacity': '0'
-        });
-        
-        setTimeout(() => {
-            $('#deleteModal .bi-exclamation-triangle').css({
-                'transition': 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                'transform': 'scale(1)',
-                'opacity': '1'
-            });
-        }, 100);
     });
+    
+    // Confirm delete - use form submission to avoid AJAX CSRF issues
+    $('#confirmDelete').click(function() {
+        const $button = $(this);
+        
+        // Show loading state
+        $button.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...');
+        
+        // Update form action to the correct URL
+        const postId = $('#delete_post_id').val();
+        $('#deletePostForm').attr('action', '<?= site_url("PostsController/delete") ?>/' + postId);
+        
+        // Submit the form
+        $('#deletePostForm').submit();
+    });
+});
     
     // Confirm delete with animations
     $('#confirmDelete').click(function() {
@@ -1006,5 +1026,24 @@ $(document).ready(function() {
 $(document).on('click', '.post-item .post-title a', function(e) {
     e.preventDefault(); // Prevents the default link behavior
     return false;      // Stops the event propagation
+});
+
+$(document).ready(function() {
+    // Override the confirmDelete button click handler
+    $('#confirmDelete').off('click').on('click', function() {
+        // Get the post ID
+        const postId = $(this).data('id');
+        
+        // Disable the button and show loading state
+        $(this).prop('disabled', true)
+            .html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...');
+        
+        // Close the modal
+        $('#deleteModal').modal('hide');
+        
+        // Perform the delete through a direct page navigation with POST param
+        // This avoids CSRF issues entirely
+        window.location.href = '<?= site_url("PostsController/direct_delete") ?>/' + postId;
+    });
 });
 </script>
