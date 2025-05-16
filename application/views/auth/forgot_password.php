@@ -7,7 +7,7 @@
                     <span></span>
                     <span></span>
                 </div>
-                <div class="card-header bg-white border-0 pt-4">
+                <div class="card-header border-0 pt-4">
                     <h3 class="text-center font-weight-bold mb-2">Password Recovery</h3>
                     <p class="text-center text-muted mb-4">Enter your email to reset your password</p>
                 </div>
@@ -47,7 +47,7 @@
                         </div>
                     </form>
                 </div>
-                <div class="card-footer bg-white text-center border-0 py-4">
+                <div class="card-footer text-center border-0 py-4">
                     <p class="mb-0">Remember your password? <a href="<?= site_url('auth/login') ?>" class="text-decoration-none fw-bold hover-effect">Sign In</a></p>
                 </div>
             </div>

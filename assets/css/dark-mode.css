@@ -562,4 +562,77 @@ body.dark-mode .blog-feed-item .feed-title {
     color: #e4e6eb !important; /* Light color for dark mode */
 }
 
+body.dark-mode .blog-post-section {
+    background-color: var(--dark-card-bg);
+    border-color: var(--dark-border);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .blog-post-section .section-header {
+    background-color: var(--dark-card-bg);
+    border-color: var(--dark-border);
+}
+
+body.dark-mode .blog-post-section .back-link {
+    color: var(--dark-text-secondary);
+}
+
+body.dark-mode .blog-post-section .back-link:hover {
+    color: var(--primary-color);
+}
+
+/* Ensure blog post content is also styled correctly */
+body.dark-mode .blog-post-section h1,
+body.dark-mode .blog-post-section h2,
+body.dark-mode .blog-post-section h3,
+body.dark-mode .blog-post-section h4,
+body.dark-mode .blog-post-section h5,
+body.dark-mode .blog-post-section h6 {
+    color: #e4e6eb !important; /* Matching your existing heading color */
+}
+
+body.dark-mode .blog-post-section p,
+body.dark-mode .blog-post-section li,
+body.dark-mode .blog-post-section .post-content,
+body.dark-mode .blog-post-section .post-body {
+    color: var(--dark-text);
+}
+
+/* If you have code blocks or special elements */
+body.dark-mode .blog-post-section pre,
+body.dark-mode .blog-post-section code {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    border-color: var(--dark-border);
+}
+
+body.dark-mode .sidebar .user-info .username,
+body.dark-mode .sidebar .user-profile .username,
+body.dark-mode .sidebar .user-details .username,
+body.dark-mode .sidebar .user-name {
+    color: #e4e6eb !important; /* Light color for dark mode */
+}
+
+/* Fix for username on single_post.php */
+body.dark-mode .post-author .username,
+body.dark-mode .post-header .username,
+body.dark-mode .post-meta .username,
+body.dark-mode .post-details .username,
+body.dark-mode .author-info .username,
+body.dark-mode .user-profile-name,
+body.dark-mode .profile-username {
+    color: #e4e6eb !important; /* Light color for dark mode */
+}
+
+/* General username selector (for any we might have missed) */
+body.dark-mode .username {
+    color: #e4e6eb !important;
+}
+
+/* Additional fallback for user name elements that might not have the username class */
+body.dark-mode .user-name,
+body.dark-mode .display-name,
+body.dark-mode .author-name {
+    color: #e4e6eb !important;}
+
 /* Transition all properties for smooth dark mode toggle */
