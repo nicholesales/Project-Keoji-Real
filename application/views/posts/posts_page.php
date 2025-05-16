@@ -171,7 +171,6 @@ echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featu
                     <div class="mb-3">
                         <label for="content" class="form-label">Content</label>
                         <textarea class="form-control" id="content" name="content" rows="3" placeholder="Write your post content here" required></textarea>
-                        <textarea class="form-control" id="content" name="content" rows="3" placeholder="Input text" required></textarea>
                     </div>
                     
                     <div class="mb-3">
