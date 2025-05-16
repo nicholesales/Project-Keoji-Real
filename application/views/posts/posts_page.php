@@ -626,8 +626,7 @@ $(document).ready(function() {
                 
                 // Show modal with animation
                 $('#postModal').modal('show');
-                
-                // Add a slight entrance animation for form elements
+                 // Add a slight entrance animation for form elements
                 $('.modal-body .mb-3').each(function(index) {
                     $(this).css({
                         'opacity': '0',

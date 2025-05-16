@@ -44,10 +44,9 @@
             <?php endif; ?>
 
             <ul class="list-unstyled components">
-                <li>
-                    <a href="<?= site_url('posts/create') ?>">
-                        <i class="bi bi-grid sidebar-icon"></i><span>Feed</span>
-                        
+                <li <?= $this->uri->segment(1) == 'feed' ? 'class="active"' : '' ?>>
+                    <a href="<?= site_url('feed') ?>">
+                        <i class="bi bi-rss sidebar-icon"></i> Feed
                     </a>
                 </li>
                 <li class="active">

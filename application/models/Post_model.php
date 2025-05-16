@@ -29,6 +29,29 @@ class Post_model extends CI_Model
         return $this->db->get($this->table)->result_array();
     }
     
+    // Get all posts for a specific user
+    public function get_by_user($user_id)
+    {
+        $this->db->where('user_id', $user_id);
+        return $this->db->get($this->table)->result_array();
+    }
+    
+    // Get posts by status for a specific user
+    public function get_by_status($user_id, $status)
+    {
+        $this->db->where('user_id', $user_id);
+        $this->db->where('status', $status);
+        return $this->db->get($this->table)->result_array();
+    }
+    
+    // Get featured posts for a specific user
+    public function get_featured_by_user($user_id)
+    {
+        $this->db->where('user_id', $user_id);
+        $this->db->where('featured', true);
+        return $this->db->get($this->table)->result_array();
+    }
+    
     // Insert new post
     public function insert($data)
     {
@@ -68,6 +91,29 @@ class Post_model extends CI_Model
     {
         $this->db->where('user_id', $user_id);
         return $this->db->count_all_results($this->table);
+    }
+    
+    // Count posts by user and status
+    public function count_by_user_status($user_id, $status)
+    {
+        $this->db->where('user_id', $user_id);
+        $this->db->where('status', $status);
+        return $this->db->count_all_results($this->table);
+    }
+    
+    // Check if a post exists
+    public function exists($id)
+    {
+        $this->db->where($this->primaryKey, $id);
+        return ($this->db->count_all_results($this->table) > 0);
+    }
+    
+    // Check if a post belongs to a user
+    public function belongs_to_user($post_id, $user_id)
+    {
+        $this->db->where($this->primaryKey, $post_id);
+        $this->db->where('user_id', $user_id);
+        return ($this->db->count_all_results($this->table) > 0);
     }
     
     // Validation (similar to CI4's validation rules)

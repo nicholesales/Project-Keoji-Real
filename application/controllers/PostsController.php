@@ -12,65 +12,331 @@ class PostsController extends MY_Controller
     }
     
     // Display all posts (main page after login)
-    public function index()
+// Display all posts (main page after login)
+public function index()
+{
+    // Check if user is logged in
+    if (!$this->session->userdata('isLoggedIn')) {
+        redirect('auth/login');
+    }
+
+    // Get current user ID
+    $user_id = $this->session->userdata('user_id');
+    
+    // Load post model
+    $this->load->model('post_model');
+    
+    // Reset query builder to prevent conflicts
+    $this->db->reset_query();
+    
+    // Get all recent posts for the current user only
+    $this->db->where('user_id', $user_id);
+    $this->db->order_by('date_created', 'DESC');
+    $this->db->group_by('post_id');
+    $data['recentPosts'] = $this->post_model->get_all();
+
+    // Reset query builder again
+    $this->db->reset_query();
+    
+    // Get featured posts for the current user only
+    $this->db->where('user_id', $user_id);
+    $this->db->where('featured', true);
+    $this->db->group_by('post_id');
+    $data['featuredPosts'] = $this->post_model->get_all();
+    
+    // Get categories for dropdown
+    $data['categories'] = ['Lifestyle', 'Travel', 'Food', 'Sports', 'News'];
+    
+    // Set the page title
+    $data['title'] = 'Blog Posts';
+    
+    // Add post count to the view data
+    $data['post_count'] = $this->post_model->count_by_user($user_id);
+    
+    // Load the view into a variable
+    $data['content'] = $this->load->view('posts/posts_page', $data, TRUE);
+    
+    // Load the main template with our content
+    $this->load->view('layout/main_posts', $data);
+}
+    
+    // Feed page - shows all published posts from all users
+    public function feed()
     {
         // Check if user is logged in
         if (!$this->session->userdata('isLoggedIn')) {
             redirect('auth/login');
         }
-    
-        // Debug - check database connection and table structure
-        try {
-            // Debug - check tables
-            $tables = $this->db->list_tables();
-            log_message('debug', 'Database tables: ' . json_encode($tables));
+        
+        // Get all published posts with user information
+        $this->db->select('posts_table.*, user_table.username, user_table.profile_photo');
+        $this->db->from('posts_table');
+        $this->db->join('user_table', 'user_table.user_id = posts_table.user_id');
+        $this->db->where('posts_table.status', 'published');
+        $this->db->order_by('posts_table.date_created', 'DESC');
+        $query = $this->db->get();
+        $data['posts'] = $query->result_array();
+        
+        // For each post, get like count and comment count
+        foreach ($data['posts'] as &$post) {
+            // Get like count
+            $this->db->where('post_id', $post['post_id']);
+            $post['like_count'] = $this->db->count_all_results('likes_table');
             
-            // Check if posts_table exists
-            if (in_array('posts_table', $tables)) {
-                $fields = $this->db->list_fields('posts_table');
-                log_message('debug', 'posts_table fields: ' . json_encode($fields));
-                
-                // Check posts_table data
-                $query = $this->db->query('SELECT * FROM posts_table LIMIT 5');
-                $results = $query->result_array();
-                log_message('debug', 'Sample posts data: ' . json_encode($results));
-            } else {
-                log_message('error', 'posts_table does not exist!');
-            }
-        } catch (Exception $e) {
-            log_message('error', 'Database error: ' . $e->getMessage());
+            // Check if current user liked this post
+            $this->db->where('post_id', $post['post_id']);
+            $this->db->where('user_id', $this->session->userdata('user_id'));
+            $post['user_liked'] = ($this->db->count_all_results('likes_table') > 0);
+            
+            // Get comment count
+            $this->db->where('post_id', $post['post_id']);
+            $post['comment_count'] = $this->db->count_all_results('comments_table');
+            
+            // Get comments for this post with user info
+            $this->db->select('comments_table.*, user_table.username, user_table.profile_photo');
+            $this->db->from('comments_table');
+            $this->db->join('user_table', 'user_table.user_id = comments_table.user_id');
+            $this->db->where('comments_table.post_id', $post['post_id']);
+            $this->db->order_by('comments_table.date_commented', 'DESC');
+            $this->db->limit(3); // Only get latest 3 comments
+            $post['comments'] = $this->db->get()->result_array();
         }
         
-        // Debug - Log session data
-        log_message('debug', 'User session data: ' . json_encode($this->session->userdata()));
-        
-        // Get all recent posts - ensure we're getting unique records
-        $this->db->order_by('date_created', 'DESC');
-        $this->db->group_by('post_id'); // Add this line
-        $data['recentPosts'] = $this->post_model->get_all();
-
-        // Get featured posts - ensure we're getting unique records
-        $this->db->where('featured', true);
-        $this->db->group_by('post_id'); // Add this line
-        $data['featuredPosts'] = $this->post_model->get_all();
-        
-        // Get categories for dropdown
-        $data['categories'] = ['Lifestyle', 'Travel', 'Food', 'Sports', 'News'];
-        
         // Set the page title
-        $data['title'] = 'Blog Posts';
-        
-        // Add post count to the view data
-        $data['post_count'] = $this->user_data['post_count'];
+        $data['title'] = 'Blog Feed';
         
         // Load the view into a variable
-        $data['content'] = $this->load->view('posts/posts_page', $data, TRUE);
+        $data['content'] = $this->load->view('posts/feed_page', $data, TRUE);
         
         // Load the main template with our content
         $this->load->view('layout/main_posts', $data);
     }
     
-    // Rest of the controller remains the same...
+    // View a single post with all comments
+    public function view($id = null)
+    {
+        // Check if user is logged in
+        if (!$this->session->userdata('isLoggedIn')) {
+            redirect('auth/login');
+        }
+        
+        if ($id === null) {
+            show_404();
+        }
+        
+        // Get post with user information
+        $this->db->select('posts_table.*, user_table.username, user_table.profile_photo');
+        $this->db->from('posts_table');
+        $this->db->join('user_table', 'user_table.user_id = posts_table.user_id');
+        $this->db->where('posts_table.post_id', $id);
+        $this->db->where('posts_table.status', 'published');
+        $query = $this->db->get();
+        
+        if ($query->num_rows() === 0) {
+            show_404();
+        }
+        
+        $data['post'] = $query->row_array();
+        
+        // Get like count
+        $this->db->where('post_id', $id);
+        $data['post']['like_count'] = $this->db->count_all_results('likes_table');
+        
+        // Check if current user liked this post
+        $this->db->where('post_id', $id);
+        $this->db->where('user_id', $this->session->userdata('user_id'));
+        $data['post']['user_liked'] = ($this->db->count_all_results('likes_table') > 0);
+        
+        // Get comment count
+        $this->db->where('post_id', $id);
+        $data['post']['comment_count'] = $this->db->count_all_results('comments_table');
+        
+        // Get all comments for this post
+        $this->db->select('comments_table.*, user_table.username, user_table.profile_photo');
+        $this->db->from('comments_table');
+        $this->db->join('user_table', 'user_table.user_id = comments_table.user_id');
+        $this->db->where('comments_table.post_id', $id);
+        $this->db->order_by('comments_table.date_commented', 'DESC');
+        $this->db->limit(10);
+        $data['comments'] = $this->db->get()->result_array();
+        
+        // Set the page title
+        $data['title'] = $data['post']['title'];
+        
+        // Load the view into a variable
+        $data['content'] = $this->load->view('posts/single_post', $data, TRUE);
+        
+        // Load the main template with our content
+        $this->load->view('layout/main_posts', $data);
+    }
+    
+    // Like or unlike a post
+    public function toggle_like()
+    {
+        // Check if request is AJAX
+        if (!$this->input->is_ajax_request()) {
+            show_error('Direct access not allowed.');
+            return;
+        }
+        
+        // Check if user is logged in
+        if (!$this->session->userdata('isLoggedIn')) {
+            echo json_encode(['success' => false, 'message' => 'User not logged in']);
+            return;
+        }
+        
+        $post_id = $this->input->post('post_id');
+        $user_id = $this->session->userdata('user_id');
+        
+        // Check if post exists
+        $this->db->where('post_id', $post_id);
+        if ($this->db->count_all_results('posts_table') == 0) {
+            echo json_encode(['success' => false, 'message' => 'Post not found']);
+            return;
+        }
+        
+        // Check if user already liked this post
+        $this->db->where('post_id', $post_id);
+        $this->db->where('user_id', $user_id);
+        $existing_like = $this->db->count_all_results('likes_table');
+        
+        if ($existing_like > 0) {
+            // User already liked, so unlike
+            $this->db->where('post_id', $post_id);
+            $this->db->where('user_id', $user_id);
+            $this->db->delete('likes_table');
+            
+            // Get updated like count
+            $this->db->where('post_id', $post_id);
+            $like_count = $this->db->count_all_results('likes_table');
+            
+            echo json_encode([
+                'success' => true, 
+                'liked' => false,
+                'like_count' => $like_count,
+                'message' => 'Post unliked successfully'
+            ]);
+        } else {
+            // User hasn't liked, so add like
+            $likeData = [
+                'post_id' => $post_id,
+                'user_id' => $user_id,
+                'date_liked' => date('Y-m-d H:i:s')
+            ];
+            
+            $this->db->insert('likes_table', $likeData);
+            
+            // Get updated like count
+            $this->db->where('post_id', $post_id);
+            $like_count = $this->db->count_all_results('likes_table');
+            
+            echo json_encode([
+                'success' => true, 
+                'liked' => true,
+                'like_count' => $like_count,
+                'message' => 'Post liked successfully'
+            ]);
+        }
+    }
+    
+    // Add a comment to a post
+    public function add_comment()
+    {
+        // Check if request is AJAX
+        if (!$this->input->is_ajax_request()) {
+            show_error('Direct access not allowed.');
+            return;
+        }
+        
+        // Check if user is logged in
+        if (!$this->session->userdata('isLoggedIn')) {
+            echo json_encode(['success' => false, 'message' => 'User not logged in']);
+            return;
+        }
+        
+        $post_id = $this->input->post('post_id');
+        $comment_text = $this->input->post('comment_text');
+        $user_id = $this->session->userdata('user_id');
+        
+        // Validate comment text
+        if (empty($comment_text)) {
+            echo json_encode(['success' => false, 'message' => 'Comment cannot be empty']);
+            return;
+        }
+        
+        // Check if post exists
+        $this->db->where('post_id', $post_id);
+        if ($this->db->count_all_results('posts_table') == 0) {
+            echo json_encode(['success' => false, 'message' => 'Post not found']);
+            return;
+        }
+        
+        // Add comment
+        $commentData = [
+            'post_id' => $post_id,
+            'user_id' => $user_id,
+            'comment_text' => $comment_text,
+            'date_commented' => date('Y-m-d H:i:s')
+        ];
+        
+        $this->db->insert('comments_table', $commentData);
+        $comment_id = $this->db->insert_id();
+        
+        // Get the new comment with user info
+        $this->db->select('comments_table.*, user_table.username, user_table.profile_photo');
+        $this->db->from('comments_table');
+        $this->db->join('user_table', 'user_table.user_id = comments_table.user_id');
+        $this->db->where('comments_table.comment_id', $comment_id);
+        $comment = $this->db->get()->row_array();
+        
+        // Format date for display
+        $comment['formatted_date'] = date('M d, Y', strtotime($comment['date_commented']));
+        
+        echo json_encode([
+            'success' => true, 
+            'message' => 'Comment added successfully',
+            'comment' => $comment
+        ]);
+    }
+    
+    // Load more comments for a post
+    public function load_comments()
+    {
+        // Check if request is AJAX
+        if (!$this->input->is_ajax_request()) {
+            show_error('Direct access not allowed.');
+            return;
+        }
+        
+        // Check if user is logged in
+        if (!$this->session->userdata('isLoggedIn')) {
+            echo json_encode(['success' => false, 'message' => 'User not logged in']);
+            return;
+        }
+        
+        $post_id = $this->input->post('post_id');
+        $offset = $this->input->post('offset');
+        
+        // Get comments for this post with user info
+        $this->db->select('comments_table.*, user_table.username, user_table.profile_photo');
+        $this->db->from('comments_table');
+        $this->db->join('user_table', 'user_table.user_id = comments_table.user_id');
+        $this->db->where('comments_table.post_id', $post_id);
+        $this->db->order_by('comments_table.date_commented', 'DESC');
+        $this->db->limit(5, $offset);
+        $comments = $this->db->get()->result_array();
+        
+        // Format dates for display
+        foreach ($comments as &$comment) {
+            $comment['formatted_date'] = date('M d, Y', strtotime($comment['date_commented']));
+        }
+        
+        echo json_encode([
+            'success' => true,
+            'comments' => $comments
+        ]);
+    }
+    
     // Create a new post
     public function create()
     {
@@ -350,7 +616,9 @@ class PostsController extends MY_Controller
             'message' => 'Post deleted successfully'
         ]);
     }
-  public function get_drafts()
+    
+    // Get draft posts for the current user
+    public function get_drafts()
 {
     // Debug information
     log_message('debug', '==== get_drafts() called ====');
@@ -442,6 +710,8 @@ class PostsController extends MY_Controller
         echo json_encode(['success' => false, 'message' => 'Error: ' . $e->getMessage()]);
     }
 }
+
+// Get published posts for the current user
 public function get_published()
 {
     // Check if request is AJAX
@@ -458,6 +728,9 @@ public function get_published()
     
     // Get user ID from session
     $user_id = $this->session->userdata('user_id');
+    
+    // Reset query builder to prevent conflicts
+    $this->db->reset_query();
     
     // Get published posts for this user
     $this->db->where('user_id', $user_id);
@@ -503,6 +776,4 @@ public function get_published()
     }
     
     echo json_encode(['success' => true, 'html' => $html]);
-}
-
-}
+}}

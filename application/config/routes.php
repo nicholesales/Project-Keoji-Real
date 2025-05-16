@@ -61,6 +61,7 @@ $route['auth/security-question'] = 'AuthController/securityQuestion';
 $route['auth/process-security-question'] = 'AuthController/processSecurityQuestion';
 $route['auth/reset-password'] = 'AuthController/resetPassword';
 $route['auth/process-reset-password'] = 'AuthController/processResetPassword';
+$route['auth/logout'] = 'AuthController/logout';
 
 // Posts routes
 $route['posts'] = 'PostsController/index';
@@ -68,15 +69,23 @@ $route['posts/create'] = 'PostsController/create';
 $route['posts/edit/(:num)'] = 'PostsController/edit/$1';
 $route['posts/update/(:num)'] = 'PostsController/update/$1';
 $route['posts/delete/(:num)'] = 'PostsController/delete/$1';
+$route['posts/view/(:num)'] = 'PostsController/view/$1';
+$route['posts/get_drafts'] = 'PostsController/get_drafts';
+$route['posts/get_published'] = 'PostsController/get_published';
+
+// Feed routes
+$route['feed'] = 'PostsController/feed';
+$route['posts/feed'] = 'PostsController/feed';
+$route['posts/toggle_like'] = 'PostsController/toggle_like';
+$route['posts/add_comment'] = 'PostsController/add_comment';
+$route['posts/load_comments'] = 'PostsController/load_comments';
 
 // User routes
 $route['profile'] = 'UserController/profile';
 $route['user/profile'] = 'UserController/profile';
 $route['user/update-profile'] = 'UserController/updateProfile';
 
+// Default routes
 $route['default_controller'] = 'welcome';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
-
-$route['posts/get_drafts'] = 'PostsController/get_drafts';
-$route['posts/get_published'] = 'PostsController/get_published';
