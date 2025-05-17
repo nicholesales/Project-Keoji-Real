@@ -3,18 +3,26 @@
 echo '<!-- Debug: recentPosts count: ' . (isset($recentPosts) ? count($recentPosts) : 'not set') . ' -->';
 echo '<!-- Debug: featuredPosts count: ' . (isset($featuredPosts) ? count($featuredPosts) : 'not set') . ' -->';
 
-// First, add this code at the beginning of your PHP file, before the view is rendered
-// Load the required models if not already loaded
-$this->load->model('Like_model');
-$this->load->model('Comment_model');
+// First, ensure the models are loaded before using them
+$CI = &get_instance();
+$CI->load->model('Like_model');
+$CI->load->model('Comment_model');
 
 // Function to get post stats
 function get_post_stats($post_id) {
     $CI = &get_instance();
+    
+    // Get likes count
+    $likes = $CI->Like_model->count_likes($post_id);
+    
+    // Use the countCommentsOnPost method from Comment_model
+    $comments = $CI->Comment_model->countCommentsOnPost($post_id);
+    
     return [
-        'likes' => $CI->Like_model->count_likes($post_id),
-        'comments' => $CI->Comment_model->count_comments($post_id)
-    ];}
+        'likes' => $likes,
+        'comments' => $comments
+    ];
+}
 ?>
 
 <div class="blog-posts-section">
